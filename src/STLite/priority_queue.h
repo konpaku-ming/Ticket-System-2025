@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <functional>
 
-#include "exceptions.hpp"
+#include "exceptions.h"
 
 namespace sjtu {
 /**

@@ -5,8 +5,8 @@
 #define SJTU_MAP_HPP
 
 // only for std::less<T>
-#include "exceptions.hpp"
-#include "utility.hpp"
+#include "exceptions.h"
+#include "utility.h"
 #include <cstddef>
 #include <functional>
 

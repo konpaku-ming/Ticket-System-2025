@@ -6,7 +6,7 @@
 #include <iostream>
 #include <memory>
 
-#include "exceptions.hpp"
+#include "exceptions.h"
 
 namespace sjtu {
 /**
