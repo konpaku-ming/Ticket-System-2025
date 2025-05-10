@@ -9,4 +9,5 @@ add_executable(code
         src/account.cpp
         src/train.cpp
         src/time.cpp
+        src/date.cpp
 )

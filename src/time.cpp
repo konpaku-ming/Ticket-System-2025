@@ -62,3 +62,15 @@ int Time::operator-(const Time &other) const {
   ret += (day - other.day) * 1440;
   return ret;
 }
+
+std::ostream &operator<<(std::ostream &out, const Time &x) {
+  if (x.hour < 10) {
+    out << 0;
+  }
+  out << x.hour << ":";
+  if (x.minute < 10) {
+    out << 0;
+  }
+  out << x.minute;
+  return out;
+}

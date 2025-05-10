@@ -7,6 +7,8 @@
 using string = std::string;
 using ll = long long;
 
+inline int day_num[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
 //用于分割指令和带'|'的东西
 inline void SpiltCommand(const string &str, sjtu::vector<string> &list, char c) {
   list.clear();

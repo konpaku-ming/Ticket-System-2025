@@ -30,7 +30,7 @@ struct Time {
 
   int operator-(const Time &other) const; //返回两个时刻之间相差多少分钟
 
-  friend std::ostream &operator<<(std::ostream &out, const Time &obj); //以时间格式输出
+  friend std::ostream &operator<<(std::ostream &out, const Time &x); //以时间格式输出
 };
 
 #endif //TIME_H
