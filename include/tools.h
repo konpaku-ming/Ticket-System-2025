@@ -10,7 +10,7 @@ using ll = long long;
 inline int day_num[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 //用于分割指令和带'|'的东西
-inline void SpiltCommand(const string &str, sjtu::vector<string> &list, char c) {
+inline void Split(const string &str, sjtu::vector<string> &list, char c) {
   list.clear();
   if (c == ' ' && str.empty())
     return;
@@ -45,8 +45,8 @@ inline ll StringToInt(const string &str) {
   return num;
 }
 
-inline bool SpiltString(const string &str, sjtu::pair<string, string> &p,
-                        char c = '=') {
+inline bool SplitPair(const string &str, sjtu::pair<string, string> &p,
+                      char c = '=') {
   string::size_type pos = str.find(c);
   if (pos == string::npos) {
     return false;

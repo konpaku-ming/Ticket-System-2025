@@ -14,8 +14,8 @@ class Account {
 
   Account();
 
-  Account(const std::string &u, const std::string &p, const std::string &n,
-          const std::string &m, const std::string &g);
+  Account(const string &u, const string &p, const string &n,
+          const string &m, const string &g);
 
   ~Account();
 

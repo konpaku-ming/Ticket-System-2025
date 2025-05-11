@@ -2,8 +2,8 @@
 
 Account::Account() = default;
 
-Account::Account(const std::string &u, const std::string &p, const std::string &n,
-                 const std::string &m, const std::string &g) {
+Account::Account(const string &u, const string &p, const string &n,
+                 const string &m, const string &g) {
   strcpy(username_, u.data());
   strcpy(password_, p.data());
   strcpy(name_, n.data());
