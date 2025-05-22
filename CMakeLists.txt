@@ -10,4 +10,5 @@ add_executable(code
         src/train.cpp
         src/time.cpp
         src/date.cpp
+        src/tokenscanner.cpp
 )
