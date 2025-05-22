@@ -13,6 +13,26 @@ Account::Account(const string &u, const string &p, const string &n,
 
 Account::~Account() = default;
 
+string Account::GetUsername() const {
+  return username_;
+}
+
+string Account::GetPassword() const {
+  return password_;
+}
+
+string Account::GetName() const {
+  return name_;
+}
+
+string Account::GetMailAddr() const {
+  return mailAddr_;
+}
+
+int Account::GetPrivilege() const {
+  return privilege_;
+}
+
 bool Account::operator==(const Account &other) const {
   return strcmp(username_, other.username_) == 0;
 }

@@ -6,6 +6,8 @@
 #include <string>
 using string = std::string;
 using ll = long long;
+using std::cin;
+using std::cout;
 
 inline int day_num[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 

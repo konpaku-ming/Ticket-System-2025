@@ -1,4 +1,4 @@
-#include "BPlusTree.h"
+#include "../include/BPlusTree.h"
 using std::cin;
 using std::cout;
 
@@ -232,12 +232,11 @@ void BPT::Insert(const Data &dt) {
   }
 }
 
-void BPT::Find(char key[70]) {
+int BPT::Find(char key[70]) {
   Data dt(key, -2147483648);
   if (root == 0) {
     //空树
-    cout << "null\n";
-    return;
+    return -1;
   }
   cur_idx = root;
   tree.read(cur, root, 1);
@@ -249,25 +248,9 @@ void BPT::Find(char key[70]) {
   //cur到了叶节点
   int i = lower_bound(0, cur.size - 1, dt, cur);
   if (strcmp(cur.data[i].key, key) != 0) {
-    cout << "null\n";
-    return;
+    return -1;
   }
-  int p = i;
-  while (strcmp(cur.data[p].key, key) == 0) {
-    cout << cur.data[p].value << " ";
-    if (p < cur.size - 1) {
-      p++;
-    } else {
-      if (cur.right == -1) {
-        break;
-      } else {
-        cur_idx = cur.right;
-        tree.read(cur, cur.right, 1);
-        p = 0;
-      }
-    }
-  }
-  cout << "\n";
+  return cur.data[i].value;
 }
 
 bool BPT::LeftBorrow() {

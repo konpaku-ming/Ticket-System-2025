@@ -4,7 +4,7 @@
 #include <string>
 #include <cstring>
 #include <fstream>
-using std::string;
+#include "tools.h"
 
 constexpr int MAX_SIZE = 40;
 
@@ -82,12 +82,12 @@ public:
 };
 
 struct Data {
-  char key[70]{};
+  char key[21]{};
   int value{};
 
   Data() = default;
 
-  Data(char key_[70], int value_) {
+  Data(char key_[21], int value_) {
     strcpy(key, key_);
     value = value_;
   }
@@ -154,7 +154,7 @@ private:
   void Balance(); //平衡cur节点
 
 public:
-  void Find(char key[70]);
+  int Find(char key[21]);
 
   void Insert(const Data &);
 
