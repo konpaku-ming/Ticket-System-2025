@@ -26,11 +26,11 @@ public:
   MemoryRiver(const std::string &file_name) : file_name(file_name) {
   }
 
-  void initialise(std::string FN = "") {
+  bool initialise(std::string FN = "") {
     if (FN != "")file_name = FN;
     file.open(file_name, std::ios::in | std::ios::out);
     if (file.is_open()) {
-      return;
+      return false; //文件已存在，未初始化
     }
     file.open(file_name, std::ios::out);
     file.close();
@@ -39,6 +39,7 @@ public:
     for (int i = 0; i < info_len; ++i) {
       file.write(reinterpret_cast<char *>(&tmp), sizeof(int)); //初始化文件
     }
+    return true; //成功初始化
   }
 
   void exit() {

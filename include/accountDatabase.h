@@ -3,26 +3,48 @@
 
 #include "account.h"
 #include "BPlusTree.h"
+#include "tokenscanner.h"
 #include "tools.h"
-#include "vector.h"
 
 class AccountDatabase {
+public:
   BPT account_bpt_;
   MemoryRiver<Account, 0> account_file_;
+  bool isAdmin = true;
 
-public:
+  AccountDatabase() {
+    bool flag = account_file_.initialise("account_data");
+    if (!flag)isAdmin = false;
+  }
+
   bool AddUser(Account &x) {
     int pos = account_bpt_.Find(x.username_);
     if (pos != -1)return false;
     int idx = account_file_.push(x);
     const Data tmp_dt(x.username_, idx);
     account_bpt_.Insert(tmp_dt);
-    cout << "1\n";
+    cout << "0\n";
     return true;
   }
 
+  //先检查-u是否登录
+  int Login(const string &u, const string &p) {
+    char username[21];
+    if (u.length() < 21) {
+      strcpy(username, u.data());
+    }
+    int pos = account_bpt_.Find(username);
+    if (pos == -1)return -1; //-u不存在
+    Account u_account;
+    account_file_.read(u_account, pos, 1);
+    if (strcmp(u_account.password_, p.data()) != 0) {
+      return -1;
+    }
+    return pos;
+  }
+
   //检查完-c是否登录后再Query
-  bool QueryProfile(int c_idx, const string &u) {
+  bool QueryProfile(const int c_idx, const string &u) {
     char username[21];
     if (u.length() < 21) {
       strcpy(username, u.data());
@@ -49,7 +71,7 @@ public:
   }
 
   //同样要先检查完-c是否登录
-  bool ModifyProfile(int c_idx, const string &u, sjtu::vector<string> &info) {
+  bool ModifyProfile(int c_idx, const string &u, TokenScanner &tokens) {
     char username[21];
     if (u.length() < 21) {
       strcpy(username, u.data());
@@ -60,23 +82,23 @@ public:
       //-u == -c
       Account u_account;
       account_file_.read(u_account, pos, 1);
-      if (!info[3].empty()) {
+      if (!tokens.g_.empty()) {
         //privilege(最先检查)
-        int privilege = StringToInt(info[3]);
+        int privilege = StringToInt(tokens.g_);
         if (u_account.privilege_ <= privilege)return false;
         u_account.privilege_ = privilege;
       }
-      if (!info[0].empty()) {
+      if (!tokens.p_.empty()) {
         //password
-        strcpy(u_account.password_, info[0].data());
+        strcpy(u_account.password_, tokens.p_.data());
       }
-      if (!info[1].empty()) {
+      if (!tokens.n_.empty()) {
         //name
-        strcpy(u_account.name_, info[1].data());
+        strcpy(u_account.name_, tokens.n_.data());
       }
-      if (!info[2].empty()) {
+      if (!tokens.m_.empty()) {
         //mailAddr
-        strcpy(u_account.mailAddr_, info[2].data());
+        strcpy(u_account.mailAddr_, tokens.m_.data());
       }
       cout << u_account.GetUsername() << " " << u_account.GetName() << " "
           << u_account.GetMailAddr() << " " << u_account.GetPrivilege();
@@ -88,23 +110,23 @@ public:
     account_file_.read(c_account, c_idx, 1);
     account_file_.read(u_account, pos, 1);
     if (c_account.privilege_ <= u_account.privilege_)return false;
-    if (!info[3].empty()) {
+    if (!tokens.g_.empty()) {
       //privilege(最先检查)
-      int privilege = StringToInt(info[3]);
+      int privilege = StringToInt(tokens.g_);
       if (c_account.privilege_ <= privilege)return false;
       u_account.privilege_ = privilege;
     }
-    if (!info[0].empty()) {
+    if (!tokens.p_.empty()) {
       //password
-      strcpy(u_account.password_, info[0].data());
+      strcpy(u_account.password_, tokens.p_.data());
     }
-    if (!info[1].empty()) {
+    if (!tokens.n_.empty()) {
       //name
-      strcpy(u_account.name_, info[1].data());
+      strcpy(u_account.name_, tokens.n_.data());
     }
-    if (!info[2].empty()) {
+    if (!tokens.m_.empty()) {
       //mailAddr
-      strcpy(u_account.mailAddr_, info[2].data());
+      strcpy(u_account.mailAddr_, tokens.m_.data());
     }
     cout << u_account.GetUsername() << " " << u_account.GetName() << " "
         << u_account.GetMailAddr() << " " << u_account.GetPrivilege() << "\n";
