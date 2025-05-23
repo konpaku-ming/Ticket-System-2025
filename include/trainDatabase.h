@@ -11,7 +11,6 @@ class TrainDatabase {
 public:
   BPT train_bpt_{"train_bpt_"};
   MemoryRiver<Train, 0> train_file_; //存放火车信息
-  //TODO
 
   TrainDatabase() {
     train_file_.initialise("train_data");
@@ -23,13 +22,29 @@ public:
     char train_id[21];
     if (tokens.i_.length() < 21) {
       strcpy(train_id, tokens.i_.data());
-    }
+    } else return false;
     if (train_bpt_.Find(train_id) != -1)return false;
     Train tmp(tokens.i_, tokens.n_, tokens.m_, tokens.s_, tokens.p_,
               tokens.x_, tokens.t_, tokens.o_, tokens.d_, tokens.y_);
     int idx = train_file_.push(tmp);
     const Data tmp_dt(tmp.trainID_, idx);
     train_bpt_.Insert(tmp_dt);
+    cout << "0\n";
+    return true;
+  }
+
+  bool DeleteTrain(const string &i) {
+    char train_id[21];
+    if (i.length() < 21) {
+      strcpy(train_id, i.data());
+    } else return false;
+    int pos = train_bpt_.Find(train_id);
+    if (pos == -1)return false;
+    Train i_train;
+    train_file_.read(i_train, pos, 1);
+    if (i_train.is_release_)return false;
+    const Data tmp_dt(train_id, pos);
+    train_bpt_.Remove(tmp_dt);
     cout << "0\n";
     return true;
   }

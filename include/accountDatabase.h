@@ -17,7 +17,7 @@ public:
     if (!flag)isAdmin = false;
   }
 
-  ~AccountDatabase();
+  ~AccountDatabase() = default;
 
   bool AddUser(Account &x) {
     int pos = account_bpt_.Find(x.username_);
@@ -34,7 +34,7 @@ public:
     char username[21];
     if (u.length() < 21) {
       strcpy(username, u.data());
-    }
+    } else return -1;
     int pos = account_bpt_.Find(username);
     if (pos == -1)return -1; //-u不存在
     Account u_account;
@@ -50,7 +50,7 @@ public:
     char username[21];
     if (u.length() < 21) {
       strcpy(username, u.data());
-    }
+    } else return false;
     int pos = account_bpt_.Find(username);
     if (pos == -1)return false; //-u不存在
     if (pos == c_idx) {
@@ -77,7 +77,7 @@ public:
     char username[21];
     if (u.length() < 21) {
       strcpy(username, u.data());
-    }
+    } else return false;
     int pos = account_bpt_.Find(username);
     if (pos == -1)return false; //-u不存在
     if (pos == c_idx) {

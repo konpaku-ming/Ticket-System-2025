@@ -6,6 +6,7 @@
 #include <fstream>
 #include <utility>
 #include "tools.h"
+#include "vector.h"
 
 constexpr int MAX_SIZE = 40;
 
@@ -162,6 +163,8 @@ private:
 
 public:
   int Find(char key[21]);
+
+  void MultiFind(char key[21], sjtu::vector<int> &value_list);
 
   void Insert(const Data &);
 

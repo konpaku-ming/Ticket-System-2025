@@ -55,3 +55,5 @@ Train::Train(const string &i, const string &n, const string &m, const string &s,
   this->StringToSaleDate(d);
   type_ = y[0];
 }
+
+Train::~Train() = default;

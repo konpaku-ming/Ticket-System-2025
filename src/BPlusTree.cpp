@@ -232,7 +232,7 @@ void BPT::Insert(const Data &dt) {
   }
 }
 
-int BPT::Find(char key[70]) {
+int BPT::Find(char key[21]) {
   Data dt(key, -2147483648);
   if (root == 0) {
     //空树
@@ -251,6 +251,43 @@ int BPT::Find(char key[70]) {
     return -1;
   }
   return cur.data[i].value;
+}
+
+void BPT::MultiFind(char key[21], sjtu::vector<int> &value_list) {
+  //一对多的情况下使用
+  value_list.clear();
+  Data dt(key, -2147483648);
+  if (root == 0) {
+    //空树
+    return;
+  }
+  cur_idx = root;
+  tree.read(cur, root, 1);
+  while (!cur.is_leaf) {
+    int i = lower_bound(0, cur.size - 1, dt, cur);
+    cur_idx = cur.child[i];
+    tree.read(cur, cur_idx, 1);
+  }
+  //cur到了叶节点
+  int i = lower_bound(0, cur.size - 1, dt, cur);
+  if (strcmp(cur.data[i].key, key) != 0) {
+    return;
+  }
+  int p = i;
+  while (strcmp(cur.data[p].key, key) == 0) {
+    value_list.push_back(cur.data[p].value);
+    if (p < cur.size - 1) {
+      p++;
+    } else {
+      if (cur.right == -1) {
+        break;
+      } else {
+        cur_idx = cur.right;
+        tree.read(cur, cur.right, 1);
+        p = 0;
+      }
+    }
+  }
 }
 
 bool BPT::LeftBorrow() {
