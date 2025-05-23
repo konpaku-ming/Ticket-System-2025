@@ -232,7 +232,7 @@ void BPT::Insert(const Data &dt) {
   }
 }
 
-int BPT::Find(char key[21]) {
+int BPT::Find(char key[31]) {
   Data dt(key, -2147483648);
   if (root == 0) {
     //空树
@@ -253,7 +253,7 @@ int BPT::Find(char key[21]) {
   return cur.data[i].value;
 }
 
-void BPT::MultiFind(char key[21], sjtu::vector<int> &value_list) {
+void BPT::MultiFind(char key[31], sjtu::vector<int> &value_list) {
   //一对多的情况下使用
   value_list.clear();
   Data dt(key, -2147483648);

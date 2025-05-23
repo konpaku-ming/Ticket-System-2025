@@ -104,6 +104,7 @@ public:
       }
       cout << u_account.GetUsername() << " " << u_account.GetName() << " "
           << u_account.GetMailAddr() << " " << u_account.GetPrivilege();
+      account_file_.write(u_account, pos, 1);
       return true;
     }
     //-c与-u不同,要求-c权限大于-u
@@ -132,6 +133,7 @@ public:
     }
     cout << u_account.GetUsername() << " " << u_account.GetName() << " "
         << u_account.GetMailAddr() << " " << u_account.GetPrivilege() << "\n";
+    account_file_.write(u_account, pos, 1);
     return true;
   }
 };

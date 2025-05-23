@@ -76,6 +76,9 @@ int main() {
     } else if (tokens.op_ == "delete_train") {
       bool flag = train_database.DeleteTrain(tokens.i_);
       if (!flag)cout << "-1\n";
+    } else if (tokens.op_ == "release_train") {
+      bool flag = train_database.ReleaseTrain(tokens.i_);
+      if (!flag)cout << "-1\n";
     }
   }
   return 0;

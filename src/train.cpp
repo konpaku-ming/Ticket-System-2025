@@ -57,3 +57,15 @@ Train::Train(const string &i, const string &n, const string &m, const string &s,
 }
 
 Train::~Train() = default;
+
+Station::Station() = default;
+
+Station::Station(const string &station, const string &i,
+                 const Time &arrive_time, const Time &leave_time) {
+  strcpy(station_, station.data());
+  strcpy(trainID_, i.data());
+  arriveTime_ = arrive_time;
+  leaveTime_ = leave_time;
+}
+
+Station::~Station() = default;

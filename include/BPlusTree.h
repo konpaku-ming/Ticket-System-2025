@@ -85,12 +85,12 @@ public:
 };
 
 struct Data {
-  char key[21]{};
+  char key[31]{};
   int value{};
 
   Data() = default;
 
-  Data(char key_[21], int value_) {
+  Data(char key_[31], int value_) {
     strcpy(key, key_);
     value = value_;
   }
@@ -162,9 +162,9 @@ private:
   void Balance(); //平衡cur节点
 
 public:
-  int Find(char key[21]);
+  int Find(char key[31]);
 
-  void MultiFind(char key[21], sjtu::vector<int> &value_list);
+  void MultiFind(char key[31], sjtu::vector<int> &value_list);
 
   void Insert(const Data &);
 
