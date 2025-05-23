@@ -7,6 +7,7 @@
 #include "../include/date.h"
 
 class Train {
+public:
   char trainID_[21]{}; //唯一标识符
   int stationNum_ = 0;
   char stations_[24][31]{};
@@ -14,7 +15,7 @@ class Train {
   int prices_[24]{}; //以前缀和形式存储
   Time leaveTime_[24]{}; //在每个站的出发时间
   Time arriveTime_[24]{}; //在每个站的到达时间
-  Date saleDate_[2]{};
+  Date saleDate_[2]{}; //售卖时间区间
   char type_{};
   bool is_release_ = false; //是否发布
 

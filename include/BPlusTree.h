@@ -4,6 +4,7 @@
 #include <string>
 #include <cstring>
 #include <fstream>
+#include <utility>
 #include "tools.h"
 
 constexpr int MAX_SIZE = 40;
@@ -130,6 +131,11 @@ class BPT {
 public:
   BPT() {
     tree.initialise("Tree");
+    tree.get_info(root, 1);
+  }
+
+  explicit BPT(std::string FN) {
+    tree.initialise(FN);
     tree.get_info(root, 1);
   }
 

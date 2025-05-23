@@ -8,7 +8,7 @@
 
 class AccountDatabase {
 public:
-  BPT account_bpt_;
+  BPT account_bpt_{"account_bpt"};
   MemoryRiver<Account, 0> account_file_;
   bool isAdmin = true;
 
@@ -16,6 +16,8 @@ public:
     bool flag = account_file_.initialise("account_data");
     if (!flag)isAdmin = false;
   }
+
+  ~AccountDatabase();
 
   bool AddUser(Account &x) {
     int pos = account_bpt_.Find(x.username_);
@@ -71,7 +73,7 @@ public:
   }
 
   //同样要先检查完-c是否登录
-  bool ModifyProfile(int c_idx, const string &u, TokenScanner &tokens) {
+  bool ModifyProfile(int c_idx, const string &u, const TokenScanner &tokens) {
     char username[21];
     if (u.length() < 21) {
       strcpy(username, u.data());

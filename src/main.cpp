@@ -4,9 +4,11 @@
 #include "../include/accountDatabase.h"
 #include "../include/tokenscanner.h"
 #include "../include/vector.h"
+#include "../include/trainDatabase.h"
 
 sjtu::map<string, int> login_map; //将登录的账户全部放进login_map便于检查登录情况
 AccountDatabase account_database; //用户信息库
+TrainDatabase train_database; //售票系统信息库
 
 int main() {
   string cmd;
@@ -17,7 +19,8 @@ int main() {
       login_map.clear();
       cout << "bye\n";
       break;
-    } else if (tokens.op_ == "add_user") {
+    }
+    if (tokens.op_ == "add_user") {
       if (account_database.isAdmin) {
         //初次加入用户
         account_database.isAdmin = false;
@@ -46,7 +49,7 @@ int main() {
         int pos = account_database.Login(tokens.u_, tokens.p_);
         if (pos == -1)cout << "-1\n";
         else {
-          login_map[tokens.u_] = pos;
+          login_map.insert({tokens.u_, pos});
           cout << "0\n";
         }
       }
@@ -66,6 +69,9 @@ int main() {
       auto it = login_map.find(tokens.c_);
       if (it == login_map.end()) cout << "-1\n";
       bool flag = account_database.ModifyProfile(it->second, tokens.u_, tokens);
+      if (!flag)cout << "-1\n";
+    } else if (tokens.op_ == "add_train") {
+      bool flag = train_database.AddTrain(tokens);
       if (!flag)cout << "-1\n";
     }
   }
