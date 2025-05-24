@@ -5,6 +5,7 @@
 #include "BPlusTree.h"
 #include "tokenscanner.h"
 #include "train.h"
+#include "ticket.h"
 
 class TrainDatabase {
   //超大类，包含火车即票的全部信息
@@ -59,7 +60,7 @@ public:
     if (i.length() < 21) {
       strcpy(train_id, i.data());
     } else return false;
-    int pos = train_bpt_.Find(train_id);
+    const int pos = train_bpt_.Find(train_id);
     if (pos == -1)return false;
     Train i_train;
     train_file_.read(i_train, pos, 1);
@@ -68,7 +69,7 @@ public:
     i_train.is_release_ = true;
     for (int k = 0; k < i_train.stationNum_; k++) {
       //遍历经过的站，在每个站里都存入过站信息
-      Station tmp_st(i_train.stations_[k], i_train.trainID_,
+      Station tmp_st(i_train.stations_[k], pos,
                      i_train.arriveTime_[k], i_train.leaveTime_[k]);
       int idx = station_file_.push(tmp_st);
       const Data tmp_dt(tmp_st.station_, idx);
@@ -137,6 +138,180 @@ public:
       cout << " -> xx-xx xx:xx " << i_train.prices_[i_train.stationNum_ - 1]
           << " x" << "\n";
       //终点站特殊处理
+    }
+    return true;
+  }
+
+  bool QueryTicketByTime(const string &s, const string &t, const string &d) {
+    //以所需时间排序
+    Date date = StringToDate(d);
+    char s_name[31];
+    if (s.length() < 31) {
+      strcpy(s_name, s.data());
+    } else return false;
+    char t_name[31];
+    if (t.length() < 31) {
+      strcpy(t_name, t.data());
+    } else return false;
+    sjtu::vector<int> s_idx;
+    sjtu::vector<int> t_idx;
+    station_bpt_.MultiFind(s_name, s_idx); //找到经过s的信息索引
+    station_bpt_.MultiFind(t_name, t_idx); //找到经过t的信息索引
+    sjtu::priority_queue<int> s_train; //经过s的所有车
+    sjtu::priority_queue<int> t_train; //经过t的所有车
+    Station tmp;
+    for (const auto it: s_idx) {
+      station_file_.read(tmp, it, 1);
+      s_train.push(tmp.train_idx_);
+    }
+    for (const auto it: t_idx) {
+      station_file_.read(tmp, it, 1);
+      t_train.push(tmp.train_idx_);
+    }
+    sjtu::vector<int> st_train; //两站都过的车
+    while (!(s_train.empty() || t_train.empty())) {
+      if (s_train.top() == t_train.top()) {
+        st_train.push_back(s_train.top());
+        s_train.pop();
+        t_train.pop();
+      } else if (s_train.top() > t_train.top()) {
+        s_train.pop();
+      } else {
+        t_train.pop();
+      }
+    }
+    sjtu::priority_queue<Direct, TimeCmp> time_pq{};
+    Train tmp_train;
+    for (const auto it: st_train) {
+      train_file_.read(tmp_train, it, 1);
+      int s_pos = -1;
+      bool s_flag = false;
+      int t_pos = -1;
+      bool t_flag = false;
+      int max_num = tmp_train.seatNum_;
+      Ticket rest;
+      ticket_file_.read(rest, tmp_train.ticket_idx_, 1);
+      int delta_d = date - tmp_train.saleDate_[0];
+      for (int k = 0; k < tmp_train.stationNum_; k++) {
+        if (tmp_train.stations_[k] == s) {
+          s_pos = k;
+          s_flag = true;
+          delta_d -= tmp_train.leaveTime_[k].day;
+          if (delta_d < 0 || delta_d > tmp_train.saleDate_[1] - tmp_train.saleDate_[0])break;
+        }
+        if (tmp_train.stations_[k] == t) {
+          t_pos = k;
+          t_flag = true;
+        }
+        if (!s_flag && t_flag)break;
+        if (s_flag && !t_flag) max_num = min(max_num, rest.rest_ticket[delta_d][k]);
+      }
+      if (!s_flag && t_flag)continue; //站的方向反了
+      if (delta_d < 0 || delta_d > tmp_train.saleDate_[1] - tmp_train.saleDate_[0])continue;
+      //填入火车票
+      Direct direct;
+      direct.from_ = s;
+      direct.to_ = t;
+      direct.max_num_ = max_num;
+      direct.date_ = tmp_train.saleDate_[0] + delta_d;
+      direct.leave_time_ = tmp_train.leaveTime_[s_pos];
+      direct.arrive_Time_ = tmp_train.arriveTime_[t_pos];
+      direct.cost_ = tmp_train.prices_[t_pos] - tmp_train.prices_[s_pos];
+      direct.trainID_ = tmp_train.trainID_;
+      direct.time_ = direct.arrive_Time_ - direct.leave_time_;
+      time_pq.push(direct);
+    }
+    cout << time_pq.size() << "\n";
+    while (!time_pq.empty()) {
+      PrintDirect(time_pq.top());
+      time_pq.pop();
+    }
+    return true;
+  }
+
+  bool QueryTicketByCost(const string &s, const string &t, const string &d) {
+    //以票价排序
+    Date date = StringToDate(d);
+    char s_name[31];
+    if (s.length() < 31) {
+      strcpy(s_name, s.data());
+    } else return false;
+    char t_name[31];
+    if (t.length() < 31) {
+      strcpy(t_name, t.data());
+    } else return false;
+    sjtu::vector<int> s_idx;
+    sjtu::vector<int> t_idx;
+    station_bpt_.MultiFind(s_name, s_idx); //找到经过s的信息索引
+    station_bpt_.MultiFind(t_name, t_idx); //找到经过t的信息索引
+    sjtu::priority_queue<int> s_train; //经过s的所有车
+    sjtu::priority_queue<int> t_train; //经过t的所有车
+    Station tmp;
+    for (const auto it: s_idx) {
+      station_file_.read(tmp, it, 1);
+      s_train.push(tmp.train_idx_);
+    }
+    for (const auto it: t_idx) {
+      station_file_.read(tmp, it, 1);
+      t_train.push(tmp.train_idx_);
+    }
+    sjtu::vector<int> st_train; //两站都过的车
+    while (!(s_train.empty() || t_train.empty())) {
+      if (s_train.top() == t_train.top()) {
+        st_train.push_back(s_train.top());
+        s_train.pop();
+        t_train.pop();
+      } else if (s_train.top() > t_train.top()) {
+        s_train.pop();
+      } else {
+        t_train.pop();
+      }
+    }
+    sjtu::priority_queue<Direct, CostCmp> cost_pq{};
+    Train tmp_train;
+    for (const auto it: st_train) {
+      train_file_.read(tmp_train, it, 1);
+      int s_pos = -1;
+      bool s_flag = false;
+      int t_pos = -1;
+      bool t_flag = false;
+      int max_num = tmp_train.seatNum_;
+      Ticket rest;
+      ticket_file_.read(rest, tmp_train.ticket_idx_, 1);
+      int delta_d = date - tmp_train.saleDate_[0];
+      for (int k = 0; k < tmp_train.stationNum_; k++) {
+        if (tmp_train.stations_[k] == s) {
+          s_pos = k;
+          s_flag = true;
+          delta_d -= tmp_train.leaveTime_[k].day;
+          if (delta_d < 0 || delta_d > tmp_train.saleDate_[1] - tmp_train.saleDate_[0])break;
+        }
+        if (tmp_train.stations_[k] == t) {
+          t_pos = k;
+          t_flag = true;
+        }
+        if (!s_flag && t_flag)break;
+        if (s_flag && !t_flag) max_num = min(max_num, rest.rest_ticket[delta_d][k]);
+      }
+      if (!s_flag && t_flag)continue; //站的方向反了
+      if (delta_d < 0 || delta_d > tmp_train.saleDate_[1] - tmp_train.saleDate_[0])continue;
+      //填入火车票
+      Direct direct;
+      direct.from_ = s;
+      direct.to_ = t;
+      direct.max_num_ = max_num;
+      direct.date_ = tmp_train.saleDate_[0] + delta_d;
+      direct.leave_time_ = tmp_train.leaveTime_[s_pos];
+      direct.arrive_Time_ = tmp_train.arriveTime_[t_pos];
+      direct.cost_ = tmp_train.prices_[t_pos] - tmp_train.prices_[s_pos];
+      direct.trainID_ = tmp_train.trainID_;
+      direct.time_ = direct.arrive_Time_ - direct.leave_time_;
+      cost_pq.push(direct);
+    }
+    cout << cost_pq.size() << "\n";
+    while (!cost_pq.empty()) {
+      PrintDirect(cost_pq.top());
+      cost_pq.pop();
     }
     return true;
   }

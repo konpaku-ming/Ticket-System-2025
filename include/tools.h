@@ -3,6 +3,7 @@
 
 #include "vector.h"
 #include "utility.h"
+#include "priority_queue.h"
 #include <string>
 #include "../include/time.h"
 #include "../include/date.h"
@@ -11,8 +12,7 @@ using string = std::string;
 using ll = long long;
 using std::cin;
 using std::cout;
-
-inline int day_num[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+using std::min;
 
 //用于分割指令和带'|'的东西
 inline void Split(const string &str, sjtu::vector<string> &list, char c) {

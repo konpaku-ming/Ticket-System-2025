@@ -82,6 +82,12 @@ int main() {
     } else if (tokens.op_ == "query_train") {
       bool flag = train_database.QueryTrain(tokens.i_, tokens.d_);
       if (!flag)cout << "-1\n";
+    } else if (tokens.op_ == "query_ticket") {
+      bool flag;
+      if (tokens.p_ == "cost") {
+        flag = train_database.QueryTicketByCost(tokens.s_, tokens.t_, tokens.d_);
+      } else flag = train_database.QueryTicketByTime(tokens.s_, tokens.t_, tokens.d_);
+      if (!flag)cout << "-1\n";
     }
   }
   return 0;

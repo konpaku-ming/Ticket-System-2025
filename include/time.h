@@ -1,7 +1,7 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include "../include/tools.h"
+#include <iostream>
 
 struct Time {
   int hour;

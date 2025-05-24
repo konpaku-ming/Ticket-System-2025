@@ -1,7 +1,8 @@
 #ifndef DATE_H
 #define DATE_H
+#include <iostream>
 
-#include "../include/tools.h"
+inline int day_num[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 struct Date {
   int month;

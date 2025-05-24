@@ -60,10 +60,10 @@ Train::~Train() = default;
 
 Station::Station() = default;
 
-Station::Station(const string &station, const string &i,
+Station::Station(const string &station, const int train_idx,
                  const Time &arrive_time, const Time &leave_time) {
   strcpy(station_, station.data());
-  strcpy(trainID_, i.data());
+  train_idx_ = train_idx;
   arriveTime_ = arrive_time;
   leaveTime_ = leave_time;
 }

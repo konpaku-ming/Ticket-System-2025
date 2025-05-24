@@ -40,13 +40,13 @@ public:
 class Station {
 public:
   char station_[31]{};
-  char trainID_[21]{};
+  int train_idx_ = -1;
   Time arriveTime_;
   Time leaveTime_;
 
   Station();
 
-  Station(const string &station, const string &i,
+  Station(const string &station, int train_idx,
           const Time &arrive_time, const Time &leave_time);
 
   ~Station();
