@@ -84,4 +84,9 @@ inline Date StringToDate(const string &d) {
   return Date(StringToInt(date[0]), StringToInt(date[1]));
 }
 
+inline bool Check(const Time &t1, const Time &t2) {
+  if (t1.hour != t2.hour)return t1.hour < t2.hour;
+  return t1.minute < t2.minute;
+}
+
 #endif //TOOLS_H

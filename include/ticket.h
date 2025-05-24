@@ -13,7 +13,7 @@ struct Direct {
   string to_;
   Date date_;
   Time leave_time_;
-  Time arrive_Time_;
+  Time arrive_time_;
   int max_num_ = -1;
   int cost_ = -1;
   int time_ = -1;
@@ -37,7 +37,42 @@ inline void PrintDirect(const Direct &x) {
   cout << x.trainID_ << " " << x.from_ << " ";
   PrintDayHourMinute(x.date_, x.leave_time_);
   cout << " -> " << x.to_ << " ";
-  PrintDayHourMinute(x.date_, x.arrive_Time_);
+  PrintDayHourMinute(x.date_, x.arrive_time_);
   cout << " " << x.cost_ << " " << x.max_num_ << "\n";
 }
+
+struct Transfer {
+  //换乘票
+  Direct first_;
+  Direct second_;
+  int total_cost_ = -1; //总时间
+  int total_time_ = -1; //总价格
+
+  Transfer(const Direct &d1, const Direct &d2) {
+    first_ = d1;
+    second_ = d2;
+    total_cost_ = d1.cost_ + d2.cost_;
+    Time tmp = d2.arrive_time_;
+    tmp.day += d2.date_ - d1.date_;
+    total_time_ = d2.arrive_time_ - d1.leave_time_;
+  }
+};
+
+struct TransferTimeCmp {
+  bool operator()(const Transfer &a, const Transfer &b) const {
+    if (a.total_time_ != b.total_time_)return a.total_time_ > b.total_time_;
+    if (a.total_cost_ != b.total_cost_)return a.total_cost_ > b.total_cost_;
+    if (a.first_.trainID_ != b.first_.trainID_)return a.first_.trainID_ > b.first_.trainID_;
+    return a.second_.trainID_ > b.second_.trainID_;
+  }
+};
+
+struct TransferCostCmp {
+  bool operator()(const Transfer &a, const Transfer &b) const {
+    if (a.total_cost_ != b.total_cost_)return a.total_cost_ > b.total_cost_;
+    if (a.total_time_ != b.total_time_)return a.total_time_ > b.total_time_;
+    if (a.first_.trainID_ != b.first_.trainID_)return a.first_.trainID_ > b.first_.trainID_;
+    return a.second_.trainID_ > b.second_.trainID_;
+  }
+};
 #endif //TICKET_H
