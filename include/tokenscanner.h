@@ -13,7 +13,7 @@ public:
 
   TokenScanner();
 
-  TokenScanner(const string &cmd);
+  explicit TokenScanner(const string &cmd);
 
   ~TokenScanner();
 };

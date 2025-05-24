@@ -4,6 +4,9 @@
 #include "vector.h"
 #include "utility.h"
 #include <string>
+#include "../include/time.h"
+#include "../include/date.h"
+
 using string = std::string;
 using ll = long long;
 using std::cin;
@@ -67,6 +70,18 @@ inline bool SplitPair(const string &str, sjtu::pair<string, string> &p,
   p.first = s1;
   p.second = s2;
   return true;
+}
+
+inline void PrintDayHourMinute(const Date &date, const Time &time) {
+  cout << (date + time.day);
+  cout << " ";
+  cout << time;
+}
+
+inline Date StringToDate(const string &d) {
+  sjtu::vector<string> date;
+  Split(d, date, '-');
+  return Date(StringToInt(date[0]), StringToInt(date[1]));
 }
 
 #endif //TOOLS_H

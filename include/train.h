@@ -18,7 +18,7 @@ public:
   Date saleDate_[2]{}; //售卖时间区间
   char type_{};
   bool is_release_ = false; //是否发布
-  int ticket_idx = -1; //余票信息在文件中的位置
+  int ticket_idx_ = -1; //余票信息在文件中的位置，release时存入余票信息
 
   Train();
 

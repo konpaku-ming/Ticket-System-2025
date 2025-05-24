@@ -79,6 +79,9 @@ int main() {
     } else if (tokens.op_ == "release_train") {
       bool flag = train_database.ReleaseTrain(tokens.i_);
       if (!flag)cout << "-1\n";
+    } else if (tokens.op_ == "query_train") {
+      bool flag = train_database.QueryTrain(tokens.i_, tokens.d_);
+      if (!flag)cout << "-1\n";
     }
   }
   return 0;
