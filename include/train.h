@@ -9,15 +9,16 @@
 class Train {
 public:
   char trainID_[21]{}; //唯一标识符
-  int stationNum_ = 0;
+  int stationNum_ = -1;
   char stations_[24][31]{}; //0-base
-  int seatNum_ = 0;
+  int seatNum_ = -1;
   int prices_[24]{}; //以前缀和形式存储
   Time arriveTime_[24]{}; //在每个站的到达时间
   Time leaveTime_[24]{}; //在每个站的出发时间
   Date saleDate_[2]{}; //售卖时间区间
   char type_{};
   bool is_release_ = false; //是否发布
+  int ticket_idx = -1; //余票信息在文件中的位置
 
   Train();
 
@@ -49,6 +50,18 @@ public:
           const Time &arrive_time, const Time &leave_time);
 
   ~Station();
+};
+
+class Ticket {
+public:
+  char trainID_[21]{};
+  int rest_ticket[93][24]{}; //第一个参数是date即车次，第二个参数为每一站到下一站之间是否有票
+
+  Ticket();
+
+  Ticket(const string &i, int seatNum);
+
+  ~Ticket();
 };
 
 #endif //TRAIN_H

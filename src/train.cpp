@@ -69,3 +69,16 @@ Station::Station(const string &station, const string &i,
 }
 
 Station::~Station() = default;
+
+Ticket::Ticket() = default;
+
+Ticket::Ticket(const string &i, const int seatNum) {
+  strcpy(trainID_, i.data());
+  for (int j = 0; j <= 92; j++) {
+    for (int k = 0; k <= 23; k++) {
+      rest_ticket[j][k] = seatNum;
+    }
+  }
+}
+
+Ticket::~Ticket() = default;
