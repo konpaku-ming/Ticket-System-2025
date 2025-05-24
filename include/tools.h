@@ -47,6 +47,15 @@ inline ll StringToInt(const string &str) {
   return num;
 }
 
+inline ll TimestampToInt(const string &str) {
+  ll num = 0;
+  for (int i = 1; i < str.length() - 1; i++) {
+    num = num * 10 + (str[i] - '0');
+  }
+  return num;
+}
+
+
 inline bool SplitPair(const string &str, sjtu::pair<string, string> &p,
                       char c = '=') {
   string::size_type pos = str.find(c);
