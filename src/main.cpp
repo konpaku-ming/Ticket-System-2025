@@ -6,11 +6,10 @@
 #include "../include/vector.h"
 #include "../include/trainDatabase.h"
 
-sjtu::map<string, int> login_map; //将登录的账户全部放进login_map便于检查登录情况
-AccountDatabase account_database; //用户信息库
-TrainDatabase train_database; //售票系统信息库
-
 int main() {
+  sjtu::map<string, int> login_map; //将登录的账户全部放进login_map便于检查登录情况
+  AccountDatabase account_database; //用户信息库
+  TrainDatabase train_database; //售票系统信息库
   string cmd;
   while (getline(cin, cmd)) {
     TokenScanner tokens(cmd);
@@ -62,7 +61,10 @@ int main() {
       }
     } else if (tokens.op_ == "query_profile") {
       auto it = login_map.find(tokens.c_);
-      if (it == login_map.end()) cout << "-1\n";
+      if (it == login_map.end()) {
+        cout << "-1\n";
+        continue;
+      }
       bool flag = account_database.QueryProfile(it->second, tokens.u_);
       if (!flag)cout << "-1\n";
     } else if (tokens.op_ == "modify_profile") {
@@ -91,8 +93,8 @@ int main() {
     } else if (tokens.op_ == "query_transfer") {
       bool flag;
       if (tokens.p_ == "cost") {
-        flag = train_database.QueryTicketByCost(tokens.s_, tokens.t_, tokens.d_);
-      } else flag = train_database.QueryTicketByTime(tokens.s_, tokens.t_, tokens.d_);
+        flag = train_database.QueryTransferByCost(tokens.s_, tokens.t_, tokens.d_);
+      } else flag = train_database.QueryTransferByTime(tokens.s_, tokens.t_, tokens.d_);
       if (!flag)cout << "0\n";
     }
   }

@@ -22,7 +22,11 @@ public:
     ticket_file_.initialise("ticket_data");
   }
 
-  ~TrainDatabase() = default;
+  ~TrainDatabase() {
+    train_file_.exit();
+    station_file_.exit();
+    ticket_file_.exit();
+  }
 
   bool AddTrain(const TokenScanner &tokens) {
     char train_id[21];

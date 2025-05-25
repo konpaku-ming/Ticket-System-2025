@@ -17,7 +17,9 @@ public:
     if (!flag)isAdmin = false;
   }
 
-  ~AccountDatabase() = default;
+  ~AccountDatabase() {
+    account_file_.exit();
+  };
 
   bool AddUser(Account &x) {
     int pos = account_bpt_.Find(x.username_);
