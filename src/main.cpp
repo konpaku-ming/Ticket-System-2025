@@ -88,6 +88,12 @@ int main() {
         flag = train_database.QueryTicketByCost(tokens.s_, tokens.t_, tokens.d_);
       } else flag = train_database.QueryTicketByTime(tokens.s_, tokens.t_, tokens.d_);
       if (!flag)cout << "-1\n";
+    } else if (tokens.op_ == "query_transfer") {
+      bool flag;
+      if (tokens.p_ == "cost") {
+        flag = train_database.QueryTicketByCost(tokens.s_, tokens.t_, tokens.d_);
+      } else flag = train_database.QueryTicketByTime(tokens.s_, tokens.t_, tokens.d_);
+      if (!flag)cout << "0\n";
     }
   }
   return 0;

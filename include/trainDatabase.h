@@ -449,6 +449,7 @@ public:
         }
       }
     }
+    if (find_best.empty())return false;
     PrintDirect(find_best.top().first_);
     PrintDirect(find_best.top().second_);
     return true;
@@ -585,6 +586,7 @@ public:
         }
       }
     }
+    if (find_best.empty())return false;
     PrintDirect(find_best.top().first_);
     PrintDirect(find_best.top().second_);
     return true;
