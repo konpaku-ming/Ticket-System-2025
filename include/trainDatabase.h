@@ -170,7 +170,10 @@ public:
     sjtu::vector<int> t_idx;
     station_bpt_.MultiFind(s_name, s_idx); //找到经过s的信息索引
     station_bpt_.MultiFind(t_name, t_idx); //找到经过t的信息索引
-    if (s_idx.empty() || t_idx.empty())return false;
+    if (s_idx.empty() || t_idx.empty()) {
+      cout << "0\n";
+      return true;
+    }
     sjtu::priority_queue<int> s_train; //经过s的所有车
     sjtu::priority_queue<int> t_train; //经过t的所有车
     Station tmp;
@@ -198,7 +201,7 @@ public:
     Train tmp_train;
     for (const auto it: st_train) {
       train_file_.read(tmp_train, it, 1);
-      if (tmp_train.saleDate_[0] > date || date > tmp_train.saleDate_[1])continue;
+      if (tmp_train.saleDate_[0] > date)continue;
       int delta_d = date - tmp_train.saleDate_[0];
       int s_pos = -1;
       bool s_flag = false;
@@ -259,7 +262,10 @@ public:
     sjtu::vector<int> t_idx;
     station_bpt_.MultiFind(s_name, s_idx); //找到经过s的信息索引
     station_bpt_.MultiFind(t_name, t_idx); //找到经过t的信息索引
-    if (s_idx.empty() || t_idx.empty())return false;
+    if (s_idx.empty() || t_idx.empty()) {
+      cout << "0\n";
+      return true;
+    }
     sjtu::priority_queue<int> s_train; //经过s的所有车
     sjtu::priority_queue<int> t_train; //经过t的所有车
     Station tmp;
@@ -287,7 +293,7 @@ public:
     Train tmp_train;
     for (const auto it: st_train) {
       train_file_.read(tmp_train, it, 1);
-      if (tmp_train.saleDate_[0] > date || date > tmp_train.saleDate_[1])continue;
+      if (tmp_train.saleDate_[0] > date)continue;
       int delta_d = date - tmp_train.saleDate_[0];
       int s_pos = -1;
       bool s_flag = false;
