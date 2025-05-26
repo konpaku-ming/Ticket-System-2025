@@ -198,6 +198,8 @@ public:
     Train tmp_train;
     for (const auto it: st_train) {
       train_file_.read(tmp_train, it, 1);
+      if (tmp_train.saleDate_[0] > date || date > tmp_train.saleDate_[1])continue;
+      int delta_d = date - tmp_train.saleDate_[0];
       int s_pos = -1;
       bool s_flag = false;
       int t_pos = -1;
@@ -205,7 +207,6 @@ public:
       int max_num = tmp_train.seatNum_;
       Ticket rest;
       ticket_file_.read(rest, tmp_train.ticket_idx_, 1);
-      int delta_d = date - tmp_train.saleDate_[0];
       for (int k = 0; k < tmp_train.stationNum_; k++) {
         if (tmp_train.stations_[k] == s) {
           s_pos = k;
@@ -286,6 +287,8 @@ public:
     Train tmp_train;
     for (const auto it: st_train) {
       train_file_.read(tmp_train, it, 1);
+      if (tmp_train.saleDate_[0] > date || date > tmp_train.saleDate_[1])continue;
+      int delta_d = date - tmp_train.saleDate_[0];
       int s_pos = -1;
       bool s_flag = false;
       int t_pos = -1;
@@ -293,7 +296,6 @@ public:
       int max_num = tmp_train.seatNum_;
       Ticket rest;
       ticket_file_.read(rest, tmp_train.ticket_idx_, 1);
-      int delta_d = date - tmp_train.saleDate_[0];
       for (int k = 0; k < tmp_train.stationNum_; k++) {
         if (tmp_train.stations_[k] == s) {
           s_pos = k;
@@ -752,10 +754,9 @@ public:
     string i = string(u_order.trainID_) + IntToString(u_order.d_);
     sjtu::vector<int> i_pending; //候补队列
     pending_bpt_.MultiFind(i.data(), i_pending);
-    auto i_it = i_pending.end();
+    auto i_it = i_pending.begin();
     PendingOrder p_order;
-    while (i_it != i_pending.begin()) {
-      --i_it;
+    while (i_it != i_pending.end()) {
       pending_file_.read(p_order, *i_it, 1);
       //检查p_order是否可以候补成功
       int s_pos = -1;
@@ -768,7 +769,10 @@ public:
       for (int k = s_pos; k < t_pos; k++) {
         max_num = min(max_num, rest.rest_ticket[u_order.d_][k]);
       }
-      if (p_order.num_ > max_num)continue;
+      if (p_order.num_ > max_num) {
+        ++i_it;
+        continue;
+      }
       //能候补上
       Order o;
       order_file_.read(o, p_order.idx_, 1);
@@ -780,9 +784,10 @@ public:
       }
       Data dt;
       strcpy(dt.key, i.data());
-      dt.value = *it;
+      dt.value = *i_it;
       pending_bpt_.Remove(dt);
       //在候补队列中删除p_order
+      ++i_it;
     }
     //遍历完后把余票信息存起来
     ticket_file_.write(rest, i_train.ticket_idx_, 1);
