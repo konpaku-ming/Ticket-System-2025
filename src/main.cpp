@@ -69,7 +69,10 @@ int main() {
       if (!flag)cout << "-1\n";
     } else if (tokens.op_ == "modify_profile") {
       auto it = login_map.find(tokens.c_);
-      if (it == login_map.end()) cout << "-1\n";
+      if (it == login_map.end()) {
+        cout << "-1\n";
+        continue;
+      }
       bool flag = account_database.ModifyProfile(it->second, tokens.u_, tokens);
       if (!flag)cout << "-1\n";
     } else if (tokens.op_ == "add_train") {
@@ -96,6 +99,22 @@ int main() {
         flag = train_database.QueryTransferByCost(tokens.s_, tokens.t_, tokens.d_);
       } else flag = train_database.QueryTransferByTime(tokens.s_, tokens.t_, tokens.d_);
       if (!flag)cout << "0\n";
+    } else if (tokens.op_ == "buy_ticket") {
+      auto it = login_map.find(tokens.u_);
+      if (it == login_map.end()) {
+        cout << "-1\n";
+        continue;
+      }
+      bool flag = train_database.BuyTicket(tokens);
+      if (!flag)cout << "-1\n";
+    } else if (tokens.op_ == "query_order") {
+      auto it = login_map.find(tokens.u_);
+      if (it == login_map.end()) {
+        cout << "-1\n";
+        continue;
+      }
+      bool flag = train_database.QueryOrder(tokens.u_);
+      if (!flag)cout << "-1\n";
     }
   }
   return 0;

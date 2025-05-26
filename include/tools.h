@@ -7,6 +7,7 @@
 #include <string>
 #include "../include/time.h"
 #include "../include/date.h"
+#include "../include/order.h"
 
 using string = std::string;
 using ll = long long;
@@ -50,6 +51,20 @@ inline ll StringToInt(const string &str) {
   return num;
 }
 
+inline string IntToString(int d) {
+  string s{};
+  char ch[20];
+  int p = 0;
+  while (d != 0) {
+    ch[p++] = '0' + (d % 10);
+    d /= 10;
+  }
+  for (int i = p - 1; i >= 0; i--) {
+    s.push_back(ch[i]);
+  }
+  return s;
+}
+
 inline ll TimestampToInt(const string &str) {
   ll num = 0;
   for (int i = 1; i < str.length() - 1; i++) {
@@ -87,6 +102,17 @@ inline Date StringToDate(const string &d) {
 inline bool Check(const Time &t1, const Time &t2) {
   if (t1.hour != t2.hour)return t1.hour < t2.hour;
   return t1.minute < t2.minute;
+}
+
+inline void PrintOrder(const Order &x) {
+  if (x.status_ == order_status::kSuccess)cout << "[success] ";
+  else if (x.status_ == order_status::kPending)cout << "[pending] ";
+  else if (x.status_ == order_status::kRefunded)cout << "[refunded] ";
+  cout << x.trainID_ << " " << x.from_ << " ";
+  PrintDayHourMinute(x.date_, x.leave_time_);
+  cout << " -> " << x.to_ << " ";
+  PrintDayHourMinute(x.date_, x.arrive_time_);
+  cout << " " << x.price_ << " " << x.num_ << "\n";
 }
 
 #endif //TOOLS_H

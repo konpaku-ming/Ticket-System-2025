@@ -42,8 +42,6 @@ public:
   bool operator<=(const Order &other) const;
 
   bool operator>=(const Order &other) const;
-
-  friend std::ostream &operator<<(std::ostream &out, const Order &x);
 };
 
 //用于处理候补车票的类，以trainID+车次号为键

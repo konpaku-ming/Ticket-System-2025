@@ -6,26 +6,35 @@
 #include "tokenscanner.h"
 #include "train.h"
 #include "ticket.h"
+#include "order.h"
 
 class TrainDatabase {
-  //超大类，包含火车即票的全部信息
+  //超大数据库类，包含火车于票的全部信息
 public:
   BPT train_bpt_{"train_bpt_"};
   MemoryRiver<Train, 0> train_file_; //存放火车信息
   BPT station_bpt_{"station_bpt"};
   MemoryRiver<Station, 0> station_file_; //存放过站信息
   MemoryRiver<Ticket, 0> ticket_file_; //存放余票信息
+  BPT order_bpt_{"order_bpt_"};
+  MemoryRiver<Order, 0> order_file_; //存放订单信息
+  BPT pending_bpt_{"pending_bpt_"};
+  MemoryRiver<PendingOrder, 0> pending_file_; //存放候补订单
 
   TrainDatabase() {
     train_file_.initialise("train_data");
     station_file_.initialise("station_data");
     ticket_file_.initialise("ticket_data");
+    order_file_.initialise("order_data");
+    pending_file_.initialise("pending_data");
   }
 
   ~TrainDatabase() {
     train_file_.exit();
     station_file_.exit();
     ticket_file_.exit();
+    order_file_.exit();
+    pending_file_.exit();
   }
 
   bool AddTrain(const TokenScanner &tokens) {
@@ -593,6 +602,102 @@ public:
     if (find_best.empty())return false;
     PrintDirect(find_best.top().first_);
     PrintDirect(find_best.top().second_);
+    return true;
+  }
+
+  //先检查登录
+  bool BuyTicket(const TokenScanner &tokens) {
+    Date d = StringToDate(tokens.d_); //从s离开的日期
+    char train_id[21];
+    if (tokens.i_.length() < 21) {
+      strcpy(train_id, tokens.i_.data());
+    } else return false;
+    int pos = train_bpt_.Find(train_id);
+    if (pos == -1)return false;
+    Train i_train;
+    train_file_.read(i_train, pos, 1);
+    if (!i_train.is_release_)return false;
+    int s_pos = -1;
+    int t_pos = -1;
+    for (int k = 0; k < i_train.stationNum_; k++) {
+      if (i_train.stations_[k] == tokens.s_)s_pos = k;
+      else if (i_train.stations_[k] == tokens.t_)t_pos = k;
+    }
+    if (s_pos == -1 || t_pos == -1 || s_pos >= t_pos)return false;
+    Date date = d - i_train.leaveTime_[s_pos].day;
+    if (i_train.saleDate_[0] > date || i_train.saleDate_[1] < date)return false;
+    //在售票期间内
+    int delta_d = date - i_train.saleDate_[0];
+    Ticket rest;
+    ticket_file_.read(rest, i_train.ticket_idx_, 1);
+    int max_num = i_train.seatNum_;
+    for (int k = s_pos; k < t_pos; k++) {
+      max_num = min(max_num, rest.rest_ticket[delta_d][k]);
+    }
+    int price = i_train.prices_[t_pos] - i_train.prices_[s_pos];
+    //max_num为最大购买票数
+    int n = StringToInt(tokens.n_);
+    if (n <= max_num) {
+      //可以直接买
+      for (int k = s_pos; k < t_pos; k++) {
+        rest.rest_ticket[delta_d][k] -= n;
+      }
+      ticket_file_.write(rest, i_train.ticket_idx_, 1);
+      Order u_order(tokens.u_, tokens.i_, tokens.s_, tokens.t_, date,
+                    i_train.leaveTime_[s_pos], i_train.arriveTime_[t_pos],
+                    price, n, order_status::kSuccess, tokens.timestamp_);
+      int idx = order_file_.push(u_order);
+      Data tmp_dt;
+      tmp_dt.value = idx;
+      strcpy(tmp_dt.key, tokens.u_.data());
+      order_bpt_.Insert(tmp_dt); //idx越小订单越早
+      cout << n * price << "\n";
+      return true;
+    }
+    //余票不足
+    if (tokens.q_ == "true") {
+      //加入候补
+      Order u_order(tokens.u_, tokens.i_, tokens.s_, tokens.t_, date,
+                    i_train.leaveTime_[s_pos], i_train.arriveTime_[t_pos],
+                    price, n, order_status::kPending, tokens.timestamp_);
+      int idx = order_file_.push(u_order);
+      Data tmp_dt;
+      tmp_dt.value = idx;
+      strcpy(tmp_dt.key, tokens.u_.data());
+      order_bpt_.Insert(tmp_dt); //idx越小订单越早
+      PendingOrder pending(tokens.i_, tokens.s_, tokens.t_, tokens.timestamp_, n, idx);
+      int p_idx = pending_file_.push(pending);
+      Data dt;
+      dt.value = p_idx;
+      string i = tokens.i_ + IntToString(delta_d);
+      strcpy(tmp_dt.key, i.data());
+      pending_bpt_.Insert(dt);
+      cout << "queue\n";
+      return true;
+    }
+    return false;
+  }
+
+  //先检查登录
+  bool QueryOrder(const string &u) {
+    char username[21];
+    if (u.length() < 21) {
+      strcpy(username, u.data());
+    } else return false;
+    sjtu::vector<int> u_idx;
+    order_bpt_.MultiFind(username, u_idx); //u的所有order的索引
+    if (u_idx.empty()) {
+      cout << "0\n";
+      return true;
+    }
+    cout << u_idx.size() << "\n";
+    auto it = u_idx.end();
+    Order u_order;
+    while (it != u_idx.begin()) {
+      --it;
+      order_file_.read(u_order, *it, 1);
+      PrintOrder(u_order);
+    }
     return true;
   }
 };

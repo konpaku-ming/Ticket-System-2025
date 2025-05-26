@@ -5,6 +5,7 @@
 #include "BPlusTree.h"
 #include "tokenscanner.h"
 #include "tools.h"
+#include "trainDatabase.h"
 
 class AccountDatabase {
 public:
