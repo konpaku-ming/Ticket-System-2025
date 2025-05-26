@@ -448,7 +448,7 @@ public:
             d2.from_ = tmp_train.stations_[k];
             d2.to_ = t;
             d2.max_num_ = max_num;
-            d2.date_ = date1;
+            d2.date_ = dd == 0 ? tmp_train.saleDate_[0] : date1;
             d2.leave_time_ = tmp_train.leaveTime_[k];
             d2.arrive_time_ = tmp_train.arriveTime_[t_pos];
             d2.cost_ = tmp_train.prices_[t_pos] - tmp_train.prices_[k];
@@ -585,7 +585,7 @@ public:
             d2.from_ = tmp_train.stations_[k];
             d2.to_ = t;
             d2.max_num_ = max_num;
-            d2.date_ = date1;
+            d2.date_ = dd == 0 ? tmp_train.saleDate_[0] : date1;
             d2.leave_time_ = tmp_train.leaveTime_[k];
             d2.arrive_time_ = tmp_train.arriveTime_[t_pos];
             d2.cost_ = tmp_train.prices_[t_pos] - tmp_train.prices_[k];
