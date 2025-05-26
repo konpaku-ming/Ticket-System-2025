@@ -1,10 +1,11 @@
 #ifndef ORDER_H
 #define ORDER_H
 
-#include "tools.h"
 #include "BPlusTree.h"
-#include "date.h"
+#include "../include/date.h"
 #include "../include/time.h"
+
+using std::string;
 
 enum class order_status { kSuccess, kPending, kRefunded };
 
@@ -44,6 +45,8 @@ public:
   bool operator<=(const Order &other) const;
 
   bool operator>=(const Order &other) const;
+
+  friend void PrintOrder(const Order &x);
 };
 
 //用于处理候补车票的类，以trainID+车次号为键

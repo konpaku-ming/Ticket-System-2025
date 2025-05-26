@@ -104,15 +104,4 @@ inline bool Check(const Time &t1, const Time &t2) {
   return t1.minute < t2.minute;
 }
 
-inline void PrintOrder(const Order &x) {
-  if (x.status_ == order_status::kSuccess)cout << "[success] ";
-  else if (x.status_ == order_status::kPending)cout << "[pending] ";
-  else if (x.status_ == order_status::kRefunded)cout << "[refunded] ";
-  cout << x.trainID_ << " " << x.from_ << " ";
-  PrintDayHourMinute(x.date_, x.leave_time_);
-  cout << " -> " << x.to_ << " ";
-  PrintDayHourMinute(x.date_, x.arrive_time_);
-  cout << " " << x.price_ << " " << x.num_ << "\n";
-}
-
 #endif //TOOLS_H

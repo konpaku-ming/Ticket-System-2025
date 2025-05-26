@@ -83,3 +83,14 @@ bool PendingOrder::operator>=(const PendingOrder &other) const {
 bool PendingOrder::operator<=(const PendingOrder &other) const {
   return timestamp_ <= other.timestamp_;
 }
+
+void PrintOrder(const Order &x) {
+  if (x.status_ == order_status::kSuccess)cout << "[success] ";
+  else if (x.status_ == order_status::kPending)cout << "[pending] ";
+  else if (x.status_ == order_status::kRefunded)cout << "[refunded] ";
+  cout << x.trainID_ << " " << x.from_ << " ";
+  PrintDayHourMinute(x.date_, x.leave_time_);
+  cout << " -> " << x.to_ << " ";
+  PrintDayHourMinute(x.date_, x.arrive_time_);
+  cout << " " << x.price_ << " " << x.num_ << "\n";
+}
