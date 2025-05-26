@@ -115,6 +115,21 @@ int main() {
       }
       bool flag = train_database.QueryOrder(tokens.u_);
       if (!flag)cout << "-1\n";
+    } else if (tokens.op_ == "refund_ticket") {
+      auto it = login_map.find(tokens.u_);
+      if (it == login_map.end()) {
+        cout << "-1\n";
+        continue;
+      }
+      int n = 1;
+      if (!tokens.n_.empty())n = StringToInt(tokens.n_);
+      bool flag = train_database.RefundTicket(tokens.u_, n);
+      if (!flag)cout << "-1\n";
+    } else if (tokens.op_ == "clean") {
+      login_map.clear();
+      account_database.Clean();
+      train_database.Clean();
+      cout << "0\n";
     }
   }
   return 0;

@@ -4,7 +4,8 @@ Order::Order() = default;
 
 Order::Order(const string &u, const string &i, const string &from, const string &to,
              const Date &date, const Time &leave_time, const Time &arrive_time,
-             const int price, const int num, const order_status os, const string &timestamp) {
+             const int price, const int num, const order_status os,
+             const string &timestamp, const int d) {
   strcpy(username_, u.data());
   strcpy(trainID_, i.data());
   strcpy(from_, from.data());
@@ -16,6 +17,7 @@ Order::Order(const string &u, const string &i, const string &from, const string 
   num_ = num;
   status_ = os;
   timestamp_ = TimestampToInt(timestamp);
+  d_ = d;
 }
 
 Order::~Order() = default;

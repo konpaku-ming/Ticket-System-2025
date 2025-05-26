@@ -22,12 +22,14 @@ public:
   int price_ = -1;
   int num_ = -1;
   order_status status_{};
+  int p_idx_ = -1; //对应候补订单的索引
+  int d_ = -1; //开始发售的第d天的车
 
   Order();
 
   Order(const string &u, const string &i, const string &from, const string &to,
         const Date &date, const Time &leave_time, const Time &arrive_time,
-        int price, int num, order_status os, const string &timestamp);
+        int price, int num, order_status os, const string &timestamp, int d);
 
   ~Order();
 

@@ -44,6 +44,17 @@ public:
     return true; //成功初始化
   }
 
+  void clean() {
+    file.close();
+    file.open(file_name, std::ios::out);
+    file.close();
+    file.open(file_name, std::ios::in | std::ios::out);
+    int tmp = 0;
+    for (int i = 0; i < info_len; ++i) {
+      file.write(reinterpret_cast<char *>(&tmp), sizeof(int)); //初始化文件
+    }
+  }
+
   void exit() {
     file.close();
   }
@@ -136,7 +147,7 @@ public:
   }
 
   explicit BPT(std::string FN) {
-    tree.initialise(FN);
+    tree.initialise(std::move(FN));
     tree.get_info(root, 1);
   }
 
@@ -169,5 +180,7 @@ public:
   void Insert(const Data &);
 
   void Remove(const Data &);
+
+  void Clean(); //清除文件
 };
 #endif //BPlusTree

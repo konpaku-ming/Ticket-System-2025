@@ -645,7 +645,7 @@ public:
       ticket_file_.write(rest, i_train.ticket_idx_, 1);
       Order u_order(tokens.u_, tokens.i_, tokens.s_, tokens.t_, date,
                     i_train.leaveTime_[s_pos], i_train.arriveTime_[t_pos],
-                    price, n, order_status::kSuccess, tokens.timestamp_);
+                    price, n, order_status::kSuccess, tokens.timestamp_, delta_d);
       int idx = order_file_.push(u_order);
       Data tmp_dt;
       tmp_dt.value = idx;
@@ -659,7 +659,7 @@ public:
       //加入候补
       Order u_order(tokens.u_, tokens.i_, tokens.s_, tokens.t_, date,
                     i_train.leaveTime_[s_pos], i_train.arriveTime_[t_pos],
-                    price, n, order_status::kPending, tokens.timestamp_);
+                    price, n, order_status::kPending, tokens.timestamp_, delta_d);
       int idx = order_file_.push(u_order);
       Data tmp_dt;
       tmp_dt.value = idx;
@@ -670,9 +670,13 @@ public:
       Data dt;
       dt.value = p_idx;
       string i = tokens.i_ + IntToString(delta_d);
-      strcpy(tmp_dt.key, i.data());
+      strcpy(dt.key, i.data());
       pending_bpt_.Insert(dt);
       cout << "queue\n";
+      Order o;
+      order_file_.read(o, idx, 1);
+      o.p_idx_ = p_idx;
+      order_file_.write(o, idx, 1);
       return true;
     }
     return false;
@@ -699,6 +703,103 @@ public:
       PrintOrder(u_order);
     }
     return true;
+  }
+
+  bool RefundTicket(const string &u, int n) {
+    char username[21];
+    if (u.length() < 21) {
+      strcpy(username, u.data());
+    } else return false;
+    sjtu::vector<int> u_idx;
+    order_bpt_.MultiFind(username, u_idx);
+    if (u_idx.size() < n)return false;
+    auto it = u_idx.end();
+    Order u_order;
+    while (n--)--it;
+    order_file_.read(u_order, *it, 1);
+    if (u_order.status_ == order_status::kRefunded)return false;
+    if (u_order.status_ == order_status::kPending) {
+      //清除掉该候补订单
+      u_order.status_ = order_status::kRefunded;
+      order_file_.write(u_order, *it, 1);
+      Data dt;
+      dt.value = u_order.p_idx_;
+      string i = string(u_order.trainID_) + IntToString(u_order.d_);
+      strcpy(dt.key, i.data());
+      pending_bpt_.Remove(dt);
+      cout << "0\n";
+      return true;
+    }
+    //Success
+    //清除掉该候补订单
+    u_order.status_ = order_status::kRefunded;
+    order_file_.write(u_order, *it, 1);
+    Train i_train;
+    int pos = train_bpt_.Find(u_order.trainID_);
+    train_file_.read(i_train, pos, 1); //找到train
+    Ticket rest;
+    ticket_file_.read(rest, i_train.ticket_idx_, 1); //找到余票
+    bool s_flag = false;
+    bool t_flag = false;
+    for (int k = 0; k < i_train.stationNum_; k++) {
+      if (!s_flag && strcmp(i_train.stations_[k], u_order.from_) == 0)s_flag = true;
+      if (!t_flag && strcmp(i_train.stations_[k], u_order.to_) == 0)t_flag = true;
+      if (!t_flag && s_flag) {
+        rest.rest_ticket[u_order.d_][k] += u_order.num_;
+      }
+    }
+    //更新完余票信息
+    string i = string(u_order.trainID_) + IntToString(u_order.d_);
+    sjtu::vector<int> i_pending; //候补队列
+    pending_bpt_.MultiFind(i.data(), i_pending);
+    auto i_it = i_pending.end();
+    PendingOrder p_order;
+    while (i_it != i_pending.begin()) {
+      --i_it;
+      pending_file_.read(p_order, *i_it, 1);
+      //检查p_order是否可以候补成功
+      int s_pos = -1;
+      int t_pos = -1;
+      for (int k = 0; k < i_train.stationNum_; k++) {
+        if (strcmp(i_train.stations_[k], p_order.from_) == 0)s_pos = k;
+        else if (strcmp(i_train.stations_[k], p_order.to_) == 0)t_pos = k;
+      }
+      int max_num = i_train.seatNum_;
+      for (int k = s_pos; k < t_pos; k++) {
+        max_num = min(max_num, rest.rest_ticket[u_order.d_][k]);
+      }
+      if (p_order.num_ > max_num)continue;
+      //能候补上
+      Order o;
+      order_file_.read(o, p_order.idx_, 1);
+      o.status_ = order_status::kSuccess;
+      o.p_idx_ = -1;
+      order_file_.write(o, p_order.idx_, 1);
+      for (int k = s_pos; k < t_pos; k++) {
+        rest.rest_ticket[u_order.d_][k] -= p_order.num_;
+      }
+      Data dt;
+      strcpy(dt.key, i.data());
+      dt.value = *it;
+      pending_bpt_.Remove(dt);
+      //在候补队列中删除p_order
+    }
+    //遍历完后把余票信息存起来
+    ticket_file_.write(rest, i_train.ticket_idx_, 1);
+    cout << "0\n";
+    return true;
+  }
+
+  void Clean() {
+    train_bpt_.Clean();
+    train_file_.clean();
+    station_bpt_.Clean();
+    station_file_.clean();
+    ticket_file_.clean();
+    order_bpt_.Clean();
+    order_file_.clean();
+    pending_bpt_.Clean();
+    pending_file_.clean();
   }
 };
 #endif //TRAINDATABASE_H

@@ -558,3 +558,9 @@ void BPT::Remove(const Data &dt) {
     }
   }
 }
+
+void BPT::Clean() {
+  tree.clean();
+  tree.get_info(root, 1);
+}
+

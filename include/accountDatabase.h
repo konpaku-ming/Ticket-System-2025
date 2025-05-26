@@ -139,5 +139,11 @@ public:
     account_file_.write(u_account, pos, 1);
     return true;
   }
+
+  void Clean() {
+    account_bpt_.Clean();
+    account_file_.clean();
+    isAdmin = true;
+  }
 };
 #endif //ACCOUNTDATABASE_H
