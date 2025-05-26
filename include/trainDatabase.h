@@ -617,34 +617,34 @@ public:
     Train i_train;
     train_file_.read(i_train, pos, 1);
     if (!i_train.is_release_)return false;
-    int s_pos = -1;
+    int f_pos = -1;
     int t_pos = -1;
     for (int k = 0; k < i_train.stationNum_; k++) {
-      if (i_train.stations_[k] == tokens.s_)s_pos = k;
+      if (i_train.stations_[k] == tokens.f_)f_pos = k;
       else if (i_train.stations_[k] == tokens.t_)t_pos = k;
     }
-    if (s_pos == -1 || t_pos == -1 || s_pos >= t_pos)return false;
-    Date date = d - i_train.leaveTime_[s_pos].day;
+    if (f_pos == -1 || t_pos == -1 || f_pos >= t_pos)return false;
+    Date date = d - i_train.leaveTime_[f_pos].day;
     if (i_train.saleDate_[0] > date || i_train.saleDate_[1] < date)return false;
     //在售票期间内
     int delta_d = date - i_train.saleDate_[0];
     Ticket rest;
     ticket_file_.read(rest, i_train.ticket_idx_, 1);
     int max_num = i_train.seatNum_;
-    for (int k = s_pos; k < t_pos; k++) {
+    for (int k = f_pos; k < t_pos; k++) {
       max_num = min(max_num, rest.rest_ticket[delta_d][k]);
     }
-    int price = i_train.prices_[t_pos] - i_train.prices_[s_pos];
+    int price = i_train.prices_[t_pos] - i_train.prices_[f_pos];
     //max_num为最大购买票数
     int n = StringToInt(tokens.n_);
     if (n <= max_num) {
       //可以直接买
-      for (int k = s_pos; k < t_pos; k++) {
+      for (int k = f_pos; k < t_pos; k++) {
         rest.rest_ticket[delta_d][k] -= n;
       }
       ticket_file_.write(rest, i_train.ticket_idx_, 1);
-      Order u_order(tokens.u_, tokens.i_, tokens.s_, tokens.t_, date,
-                    i_train.leaveTime_[s_pos], i_train.arriveTime_[t_pos],
+      Order u_order(tokens.u_, tokens.i_, tokens.f_, tokens.t_, date,
+                    i_train.leaveTime_[f_pos], i_train.arriveTime_[t_pos],
                     price, n, order_status::kSuccess, tokens.timestamp_, delta_d);
       int idx = order_file_.push(u_order);
       Data tmp_dt;
@@ -657,15 +657,15 @@ public:
     //余票不足
     if (tokens.q_ == "true") {
       //加入候补
-      Order u_order(tokens.u_, tokens.i_, tokens.s_, tokens.t_, date,
-                    i_train.leaveTime_[s_pos], i_train.arriveTime_[t_pos],
+      Order u_order(tokens.u_, tokens.i_, tokens.f_, tokens.t_, date,
+                    i_train.leaveTime_[f_pos], i_train.arriveTime_[t_pos],
                     price, n, order_status::kPending, tokens.timestamp_, delta_d);
       int idx = order_file_.push(u_order);
       Data tmp_dt;
       tmp_dt.value = idx;
       strcpy(tmp_dt.key, tokens.u_.data());
       order_bpt_.Insert(tmp_dt); //idx越小订单越早
-      PendingOrder pending(tokens.i_, tokens.s_, tokens.t_, tokens.timestamp_, n, idx);
+      PendingOrder pending(tokens.i_, tokens.f_, tokens.t_, tokens.timestamp_, n, idx);
       int p_idx = pending_file_.push(pending);
       Data dt;
       dt.value = p_idx;
