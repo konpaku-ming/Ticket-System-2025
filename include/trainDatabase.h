@@ -441,8 +441,8 @@ public:
             if (d1.trainID_ == tmp_train.trainID_)continue;
             Date date1;
             if (Check(d1.arrive_time_, tmp_train.leaveTime_[k])) {
-              date1 = d1.date_ + d1.arrive_time_.day + 1 - tmp_train.leaveTime_[k].day;
-            } else date1 = d1.date_ + d1.arrive_time_.day - tmp_train.leaveTime_[k].day;
+              date1 = d1.date_ + d1.arrive_time_.day - tmp_train.leaveTime_[k].day;
+            } else date1 = d1.date_ + d1.arrive_time_.day + 1 - tmp_train.leaveTime_[k].day;
             //date1为可以从当前站出发往t的最早车次
             if (date1 > tmp_train.saleDate_[1])continue; //无法构成换乘票
             int dd = (date1 > tmp_train.saleDate_[0]) ? (date1 - tmp_train.saleDate_[0]) : 0;
@@ -579,8 +579,8 @@ public:
             if (d1.trainID_ == tmp_train.trainID_)continue;
             Date date1;
             if (Check(d1.arrive_time_, tmp_train.leaveTime_[k])) {
-              date1 = d1.date_ + d1.arrive_time_.day + 1 - tmp_train.leaveTime_[k].day;
-            } else date1 = d1.date_ + d1.arrive_time_.day - tmp_train.leaveTime_[k].day;
+              date1 = d1.date_ + d1.arrive_time_.day - tmp_train.leaveTime_[k].day;
+            } else date1 = d1.date_ + d1.arrive_time_.day + 1 - tmp_train.leaveTime_[k].day;
             //date1为可以从当前站出发往t的最早车次
             if (date1 > tmp_train.saleDate_[1])continue; //无法构成换乘票
             int dd = (date1 > tmp_train.saleDate_[0]) ? (date1 - tmp_train.saleDate_[0]) : 0;

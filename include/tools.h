@@ -99,8 +99,8 @@ inline Date StringToDate(const string &d) {
 }
 
 inline bool Check(const Time &t1, const Time &t2) {
-  if (t1.hour != t2.hour)return t1.hour < t2.hour;
-  return t1.minute < t2.minute;
+  if (t1.hour != t2.hour)return t1.hour <= t2.hour;
+  return t1.minute <= t2.minute;
 }
 
 #endif //TOOLS_H

@@ -52,9 +52,14 @@ struct Transfer {
     first_ = d1;
     second_ = d2;
     total_cost_ = d1.cost_ + d2.cost_;
-    Time tmp = d2.arrive_time_;
-    tmp.day += d2.date_ - d1.date_;
-    total_time_ = d2.arrive_time_ - d1.leave_time_;
+    const Date date1 = d1.date_ + d1.leave_time_.day;
+    const Date date2 = d2.date_ + d2.arrive_time_.day;
+    const int d = date2 - date1;
+    Time time1 = d1.leave_time_;
+    time1.day = 0;
+    Time time2 = d2.arrive_time_;
+    time2.day = d;
+    total_time_ = time2 - time1;
   }
 };
 
