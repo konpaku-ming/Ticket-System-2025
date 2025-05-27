@@ -631,7 +631,7 @@ public:
     int t_pos = -1;
     for (int k = 0; k < i_train.stationNum_; k++) {
       if (i_train.stations_[k] == tokens.f_)f_pos = k;
-      else if (i_train.stations_[k] == tokens.t_)t_pos = k;
+      if (i_train.stations_[k] == tokens.t_)t_pos = k;
     }
     if (f_pos == -1 || t_pos == -1 || f_pos >= t_pos)return false;
     Date date = d - i_train.leaveTime_[f_pos].day;
@@ -641,12 +641,13 @@ public:
     Ticket rest;
     ticket_file_.read(rest, i_train.ticket_idx_, 1);
     int max_num = i_train.seatNum_;
+    int n = StringToInt(tokens.n_);
+    if (n > max_num)return false;
     for (int k = f_pos; k < t_pos; k++) {
       max_num = min(max_num, rest.rest_ticket[delta_d][k]);
     }
     int price = i_train.prices_[t_pos] - i_train.prices_[f_pos];
     //max_num为最大购买票数
-    int n = StringToInt(tokens.n_);
     if (n <= max_num) {
       //可以直接买
       for (int k = f_pos; k < t_pos; k++) {
