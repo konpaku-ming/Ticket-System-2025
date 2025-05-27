@@ -65,36 +65,36 @@ tokenscanner.h和tokenscanner.cpp实现了一个可以将命令划分并存储�
 
 ##### accountDatabase:
 
-`//key为username，value为索引的B+树`
+`//key为username，value为索引的B+树`<br>
 `BPT account_bpt_{"account_bpt"}; `
 
-`//存放用户信息，每个Account在文件中的位置与其username作为键值对插入到BPT中`
+`//存放用户信息，每个Account在文件中的位置与其username作为键值对插入到BPT中`<br>
 `MemoryRiver<Account, 0> account_file_; `
 
 ##### trainDatabase:
 
-`//key为trainID，value为用户索引的B+树`
+`//key为trainID，value为用户索引的B+树`<br>
 `BPT train_bpt_{"train_bpt_"}; `
 
-`//存放火车信息，每个Train在文件中的位置与其trainID作为键值对插入到BPT中`
+`//存放火车信息，每个Train在文件中的位置与其trainID作为键值对插入到BPT中`<br>
 `MemoryRiver<Train, 0> train_file_; `
 
-`//key为station，value为列车索引的B+树`
+`//key为station，value为列车索引的B+树`<br>
 `BPT station_bpt_{"station_bpt_"}; //记录经过station的车的索引`
 
-`//Train类里面有一个ticket_idx是其余票在文件中的位置 `
+`//Train类里面有一个ticket_idx是其余票在文件中的位置 `<br>
 `MemoryRiver<Ticket, 0> ticket_file_; //存放余票信息`
 
-`//key为username，value为订单索引的B+树`
+`//key为username，value为订单索引的B+树`<br>
 `BPT order_bpt_{"order_bpt_"};`
 
-`//存放订单信息，每个Order在文件中的位置与其username作为键值对插入到BPT中`
+`//存放订单信息，每个Order在文件中的位置与其username作为键值对插入到BPT中`<br>
 `MemoryRiver<Order, 0> order_file_; `
 
-`//key为trainID+发售天数，value为候补订单索引的B+树`
+`//key为trainID+发售天数，value为候补订单索引的B+树`<br>
 `BPT pending_bpt_{"pending_bpt_"};`
 
-`//存放候补订单信息，每个PendingOrder在文件中的位置与其购买的车次+天数作为键值对插入到BPT中`
+`//存放候补订单信息，每个PendingOrder在文件中的位置与其购买的车次+天数作为键值对插入到BPT中`<br>
 `MemoryRiver<PendingOrder, 0> pending_file_; `
 
 
