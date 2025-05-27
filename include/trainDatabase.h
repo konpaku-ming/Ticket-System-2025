@@ -376,6 +376,7 @@ public:
       int max_num = tmp_train.seatNum_;
       Ticket rest;
       ticket_file_.read(rest, tmp_train.ticket_idx_, 1);
+      if (date < tmp_train.saleDate_[0])continue;
       int delta_d = date - tmp_train.saleDate_[0];
       for (int k = 0; k < tmp_train.stationNum_; k++) {
         if (s_flag) {
@@ -513,6 +514,7 @@ public:
       int max_num = tmp_train.seatNum_;
       Ticket rest;
       ticket_file_.read(rest, tmp_train.ticket_idx_, 1);
+      if (date < tmp_train.saleDate_[0])continue;
       int delta_d = date - tmp_train.saleDate_[0];
       for (int k = 0; k < tmp_train.stationNum_; k++) {
         if (s_flag) {
