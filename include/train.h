@@ -37,21 +37,6 @@ public:
   void StringToSaleDate(const string &d);
 };
 
-class Station {
-public:
-  char station_[31]{};
-  int train_idx_ = -1;
-  Time arriveTime_;
-  Time leaveTime_;
-
-  Station();
-
-  Station(const string &station, int train_idx,
-          const Time &arrive_time, const Time &leave_time);
-
-  ~Station();
-};
-
 class Ticket {
 public:
   char trainID_[21]{};

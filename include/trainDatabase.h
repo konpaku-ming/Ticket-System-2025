@@ -13,8 +13,7 @@ class TrainDatabase {
 public:
   BPT train_bpt_{"train_bpt_"};
   MemoryRiver<Train, 0> train_file_; //存放火车信息
-  BPT station_bpt_{"station_bpt"};
-  MemoryRiver<Station, 0> station_file_; //存放过站信息
+  BPT station_bpt_{"station_bpt"}; //站名为key,train_idx为value
   MemoryRiver<Ticket, 0> ticket_file_; //存放余票信息
   BPT order_bpt_{"order_bpt_"};
   MemoryRiver<Order, 0> order_file_; //存放订单信息
@@ -23,7 +22,6 @@ public:
 
   TrainDatabase() {
     train_file_.initialise("train_data");
-    station_file_.initialise("station_data");
     ticket_file_.initialise("ticket_data");
     order_file_.initialise("order_data");
     pending_file_.initialise("pending_data");
@@ -31,7 +29,6 @@ public:
 
   ~TrainDatabase() {
     train_file_.exit();
-    station_file_.exit();
     ticket_file_.exit();
     order_file_.exit();
     pending_file_.exit();
@@ -82,10 +79,9 @@ public:
     i_train.is_release_ = true;
     for (int k = 0; k < i_train.stationNum_; k++) {
       //遍历经过的站，在每个站里都存入过站信息
-      Station tmp_st(i_train.stations_[k], pos,
-                     i_train.arriveTime_[k], i_train.leaveTime_[k]);
-      int idx = station_file_.push(tmp_st);
-      const Data tmp_dt(tmp_st.station_, idx);
+      Data tmp_dt;
+      tmp_dt.value = pos;
+      strcpy(tmp_dt.key, i_train.stations_[k]);
       station_bpt_.Insert(tmp_dt);
     }
     Ticket i_ticket(i_train.trainID_, i_train.seatNum_);
@@ -174,28 +170,13 @@ public:
       cout << "0\n";
       return true;
     }
-    sjtu::priority_queue<int> s_train; //经过s的所有车
-    sjtu::priority_queue<int> t_train; //经过t的所有车
-    Station tmp;
-    for (const auto it: s_idx) {
-      station_file_.read(tmp, it, 1);
-      s_train.push(tmp.train_idx_);
-    }
-    for (const auto it: t_idx) {
-      station_file_.read(tmp, it, 1);
-      t_train.push(tmp.train_idx_);
-    }
+    int cnt[100000]{};
     sjtu::vector<int> st_train; //两站都过的车
-    while (!(s_train.empty() || t_train.empty())) {
-      if (s_train.top() == t_train.top()) {
-        st_train.push_back(s_train.top());
-        s_train.pop();
-        t_train.pop();
-      } else if (s_train.top() > t_train.top()) {
-        s_train.pop();
-      } else {
-        t_train.pop();
-      }
+    for (auto i: s_idx) {
+      cnt[i / 1000]++;
+    }
+    for (auto i: t_idx) {
+      if (cnt[i / 1000])st_train.push_back(i);
     }
     sjtu::priority_queue<Direct, TimeCmp> time_pq{};
     Train tmp_train;
@@ -266,28 +247,13 @@ public:
       cout << "0\n";
       return true;
     }
-    sjtu::priority_queue<int> s_train; //经过s的所有车
-    sjtu::priority_queue<int> t_train; //经过t的所有车
-    Station tmp;
-    for (const auto it: s_idx) {
-      station_file_.read(tmp, it, 1);
-      s_train.push(tmp.train_idx_);
-    }
-    for (const auto it: t_idx) {
-      station_file_.read(tmp, it, 1);
-      t_train.push(tmp.train_idx_);
-    }
+    int cnt[100000]{};
     sjtu::vector<int> st_train; //两站都过的车
-    while (!(s_train.empty() || t_train.empty())) {
-      if (s_train.top() == t_train.top()) {
-        st_train.push_back(s_train.top());
-        s_train.pop();
-        t_train.pop();
-      } else if (s_train.top() > t_train.top()) {
-        s_train.pop();
-      } else {
-        t_train.pop();
-      }
+    for (auto i: s_idx) {
+      cnt[i / 1000]++;
+    }
+    for (auto i: t_idx) {
+      if (cnt[i / 1000])st_train.push_back(i);
     }
     sjtu::priority_queue<Direct, CostCmp> cost_pq{};
     Train tmp_train;
@@ -342,7 +308,7 @@ public:
   bool QueryTransferByTime(const string &s, const string &t, const string &d) {
     //以时间排序
     sjtu::map<string, sjtu::vector<Direct> > time_map{};
-    Transfer best{};
+    sjtu::priority_queue<Transfer, TransferTimeCmp> find_best{};
     Date date = StringToDate(d);
     char s_name[31];
     if (s.length() < 31) {
@@ -352,22 +318,11 @@ public:
     if (t.length() < 31) {
       strcpy(t_name, t.data());
     } else return false;
-    sjtu::vector<int> s_idx;
-    sjtu::vector<int> t_idx;
-    station_bpt_.MultiFind(s_name, s_idx); //找到经过s的信息索引
-    station_bpt_.MultiFind(t_name, t_idx); //找到经过t的信息索引
-    if (s_idx.empty() || t_idx.empty())return false;
-    sjtu::vector<int> s_train; //经过s的所有车
-    sjtu::vector<int> t_train; //经过t的所有车
-    Station tmp;
-    for (const auto it: s_idx) {
-      station_file_.read(tmp, it, 1);
-      s_train.push_back(tmp.train_idx_);
-    }
-    for (const auto it: t_idx) {
-      station_file_.read(tmp, it, 1);
-      t_train.push_back(tmp.train_idx_);
-    }
+    sjtu::vector<int> s_train;
+    sjtu::vector<int> t_train;
+    station_bpt_.MultiFind(s_name, s_train); //找到经过s的车索引
+    station_bpt_.MultiFind(t_name, t_train); //找到经过t的车索引
+    if (s_train.empty() || t_train.empty())return false;
     Train tmp_train;
     for (const auto it: s_train) {
       train_file_.read(tmp_train, it, 1);
@@ -462,7 +417,7 @@ public:
             d2.trainID_ = tmp_train.trainID_;
             d2.time_ = d2.arrive_time_ - d2.leave_time_;
             Transfer tran(d1, d2);
-            if (TransferTimeCmp(best, tran))best = tran;
+            find_best.push(tran);
           }
         }
         if (tmp_train.stations_[k] == t) {
@@ -471,16 +426,16 @@ public:
         }
       }
     }
-    if (best.total_time_ == INT_MAX)return false;
-    PrintDirect(best.first_);
-    PrintDirect(best.second_);
+    if (find_best.empty())return false;
+    PrintDirect(find_best.top().first_);
+    PrintDirect(find_best.top().second_);
     return true;
   }
 
   bool QueryTransferByCost(const string &s, const string &t, const string &d) {
     //以时间排序
     sjtu::map<string, sjtu::vector<Direct> > cost_map{};
-    Transfer best{};
+    sjtu::priority_queue<Transfer, TransferCostCmp> find_best{};
     Date date = StringToDate(d);
     char s_name[31];
     if (s.length() < 31) {
@@ -490,22 +445,11 @@ public:
     if (t.length() < 31) {
       strcpy(t_name, t.data());
     } else return false;
-    sjtu::vector<int> s_idx;
-    sjtu::vector<int> t_idx;
-    station_bpt_.MultiFind(s_name, s_idx); //找到经过s的信息索引
-    station_bpt_.MultiFind(t_name, t_idx); //找到经过t的信息索引
-    if (s_idx.empty() || t_idx.empty())return false;
-    sjtu::vector<int> s_train; //经过s的所有车
-    sjtu::vector<int> t_train; //经过t的所有车
-    Station tmp;
-    for (const auto it: s_idx) {
-      station_file_.read(tmp, it, 1);
-      s_train.push_back(tmp.train_idx_);
-    }
-    for (const auto it: t_idx) {
-      station_file_.read(tmp, it, 1);
-      t_train.push_back(tmp.train_idx_);
-    }
+    sjtu::vector<int> s_train;
+    sjtu::vector<int> t_train;
+    station_bpt_.MultiFind(s_name, s_train); //找到经过s的车索引
+    station_bpt_.MultiFind(t_name, t_train); //找到经过t的车索引
+    if (s_train.empty() || t_train.empty())return false;
     Train tmp_train;
     for (const auto it: s_train) {
       train_file_.read(tmp_train, it, 1);
@@ -600,7 +544,7 @@ public:
             d2.trainID_ = tmp_train.trainID_;
             d2.time_ = d2.arrive_time_ - d2.leave_time_;
             Transfer tran(d1, d2);
-            if (TransferCostCmp(best, tran))best = tran;
+            find_best.push(tran);
           }
         }
         if (tmp_train.stations_[k] == t) {
@@ -609,9 +553,9 @@ public:
         }
       }
     }
-    if (best.total_cost_ == INT_MAX)return false;
-    PrintDirect(best.first_);
-    PrintDirect(best.second_);
+    if (find_best.empty())return false;
+    PrintDirect(find_best.top().first_);
+    PrintDirect(find_best.top().second_);
     return true;
   }
 
@@ -808,7 +752,6 @@ public:
     train_bpt_.Clean();
     train_file_.clean();
     station_bpt_.Clean();
-    station_file_.clean();
     ticket_file_.clean();
     order_bpt_.Clean();
     order_file_.clean();
