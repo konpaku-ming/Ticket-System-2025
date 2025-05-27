@@ -8,7 +8,7 @@
 #include "tools.h"
 #include "vector.h"
 
-constexpr int MAX_SIZE = 40;
+constexpr int MAX_SIZE = 100;
 
 class BPT;
 
@@ -128,12 +128,13 @@ struct Data {
 
 struct Node {
   bool is_leaf = true; //是否为叶节点
-  Data data[MAX_SIZE + 1]{}; //节点里的元素
+  Data data[MAX_SIZE + 2]{}; //节点里的元素
   int parent = -1; //父节点索引，root为-1
   int child[MAX_SIZE + 1]{}; //子节点索引
   int left = -1; //左兄弟索引
   int right = -1; //右兄弟索引
   int size = 0; //元素数量
+
   Node() = default;
 
   Node(const Node &other) = default;

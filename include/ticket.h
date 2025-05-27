@@ -48,6 +48,11 @@ struct Transfer {
   int total_cost_ = -1; //总时间
   int total_time_ = -1; //总价格
 
+  Transfer() {
+    total_cost_ = INT_MAX;
+    total_time_ = INT_MAX;
+  }
+
   Transfer(const Direct &d1, const Direct &d2) {
     first_ = d1;
     second_ = d2;
@@ -63,21 +68,17 @@ struct Transfer {
   }
 };
 
-struct TransferTimeCmp {
-  bool operator()(const Transfer &a, const Transfer &b) const {
-    if (a.total_time_ != b.total_time_)return a.total_time_ > b.total_time_;
-    if (a.total_cost_ != b.total_cost_)return a.total_cost_ > b.total_cost_;
-    if (a.first_.trainID_ != b.first_.trainID_)return a.first_.trainID_ > b.first_.trainID_;
-    return a.second_.trainID_ > b.second_.trainID_;
-  }
-};
+inline bool TransferTimeCmp(const Transfer &a, const Transfer &b) {
+  if (a.total_time_ != b.total_time_)return a.total_time_ > b.total_time_;
+  if (a.total_cost_ != b.total_cost_)return a.total_cost_ > b.total_cost_;
+  if (a.first_.trainID_ != b.first_.trainID_)return a.first_.trainID_ > b.first_.trainID_;
+  return a.second_.trainID_ > b.second_.trainID_;
+}
 
-struct TransferCostCmp {
-  bool operator()(const Transfer &a, const Transfer &b) const {
-    if (a.total_cost_ != b.total_cost_)return a.total_cost_ > b.total_cost_;
-    if (a.total_time_ != b.total_time_)return a.total_time_ > b.total_time_;
-    if (a.first_.trainID_ != b.first_.trainID_)return a.first_.trainID_ > b.first_.trainID_;
-    return a.second_.trainID_ > b.second_.trainID_;
-  }
-};
+inline bool TransferCostCmp(const Transfer &a, const Transfer &b) {
+  if (a.total_cost_ != b.total_cost_)return a.total_cost_ > b.total_cost_;
+  if (a.total_time_ != b.total_time_)return a.total_time_ > b.total_time_;
+  if (a.first_.trainID_ != b.first_.trainID_)return a.first_.trainID_ > b.first_.trainID_;
+  return a.second_.trainID_ > b.second_.trainID_;
+}
 #endif //TICKET_H

@@ -342,7 +342,7 @@ public:
   bool QueryTransferByTime(const string &s, const string &t, const string &d) {
     //以时间排序
     sjtu::map<string, sjtu::vector<Direct> > time_map{};
-    sjtu::priority_queue<Transfer, TransferTimeCmp> find_best{};
+    Transfer best{};
     Date date = StringToDate(d);
     char s_name[31];
     if (s.length() < 31) {
@@ -462,7 +462,7 @@ public:
             d2.trainID_ = tmp_train.trainID_;
             d2.time_ = d2.arrive_time_ - d2.leave_time_;
             Transfer tran(d1, d2);
-            find_best.push(tran);
+            if (TransferTimeCmp(best, tran))best = tran;
           }
         }
         if (tmp_train.stations_[k] == t) {
@@ -471,16 +471,16 @@ public:
         }
       }
     }
-    if (find_best.empty())return false;
-    PrintDirect(find_best.top().first_);
-    PrintDirect(find_best.top().second_);
+    if (best.total_time_ == INT_MAX)return false;
+    PrintDirect(best.first_);
+    PrintDirect(best.second_);
     return true;
   }
 
   bool QueryTransferByCost(const string &s, const string &t, const string &d) {
     //以时间排序
     sjtu::map<string, sjtu::vector<Direct> > cost_map{};
-    sjtu::priority_queue<Transfer, TransferCostCmp> find_best{};
+    Transfer best{};
     Date date = StringToDate(d);
     char s_name[31];
     if (s.length() < 31) {
@@ -600,7 +600,7 @@ public:
             d2.trainID_ = tmp_train.trainID_;
             d2.time_ = d2.arrive_time_ - d2.leave_time_;
             Transfer tran(d1, d2);
-            find_best.push(tran);
+            if (TransferCostCmp(best, tran))best = tran;
           }
         }
         if (tmp_train.stations_[k] == t) {
@@ -609,9 +609,9 @@ public:
         }
       }
     }
-    if (find_best.empty())return false;
-    PrintDirect(find_best.top().first_);
-    PrintDirect(find_best.top().second_);
+    if (best.total_cost_ == INT_MAX)return false;
+    PrintDirect(best.first_);
+    PrintDirect(best.second_);
     return true;
   }
 

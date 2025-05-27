@@ -10,8 +10,6 @@ int main() {
   std::ios::sync_with_stdio(false);
   std::cin.tie(nullptr);
   std::cout.tie(nullptr);
-  //freopen("testcases/1867/1.in", "r",stdin);
-  //freopen("test.out", "w",stdout);
   sjtu::map<string, int> login_map; //将登录的账户全部放进login_map便于检查登录情况
   AccountDatabase account_database; //用户信息库
   TrainDatabase train_database; //售票系统信息库
