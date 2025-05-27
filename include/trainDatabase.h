@@ -13,7 +13,7 @@ class TrainDatabase {
 public:
   BPT train_bpt_{"train_bpt_"};
   MemoryRiver<Train, 0> train_file_; //存放火车信息
-  BPT station_bpt_{"station_bpt"}; //站名为key,train_idx为value
+  BPT station_bpt_{"station_bpt_"}; //站名为key,train_idx为value
   MemoryRiver<Ticket, 0> ticket_file_; //存放余票信息
   BPT order_bpt_{"order_bpt_"};
   MemoryRiver<Order, 0> order_file_; //存放订单信息
