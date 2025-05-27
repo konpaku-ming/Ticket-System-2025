@@ -1,85 +1,100 @@
-# 火车票管理系统
+# Konpaku_ming's Ticket_System-2025
 
-SJTU CS1951 课程大作业
+这里是youming的大作业Ticket_System，作业要求见[管理系统文档](https://github.com/konpaku-ming/Ticket-System-2025/blob/main/management_system.md)
+希望阅读该文档能帮助你理解本仓库代码<br>
 
-## 概况
+## 仓库结构
 
-### 作业安排
+#### include/
+
+- BPlusTree.h
+- account.h
+- accountDatabase.h
+- date.h
+- exceptions.h
+- map.h
+- order.h
+- priority_queue.h
+- ticket.h
+- time.h
+- tokenscanner.h
+- tools.h
+- train.h
+- trainDatabase.h
+- utility.h
+- vector.h
+
+#### src/
+
+- BPlusTree.cpp
+- account.cpp
+- date.cpp
+- main.cpp
+- order.cpp
+- time.cpp
+- tokenscanner.cpp
+- train.cpp
+
+**CMakeLists.txt**
+**README.md**
+**management_system.md**
+
+## 文件概述
+
+utility.h, exceptions.h, vector.h, priority_queue.h, map.h实现了与STL接近的vector, priority_queue, map的功能
+
+BPlusTree.h与BPlusTree.cpp实现了一个外存中的B+树，允许将一个string类型的key和一个int类型的value作为键值对储存，并支持查找和删除功能
+
+date.h, date.cpp, time.h, time.cpp实现了日期、时刻类，支持日期和时刻与整型的简单加减，实现了日期、时刻类的输出流运算符重载
+
+account.h, account.cpp实现了用户类，accountDatabase实现了一个用户管理类，支持添加用户、登录、修改用户信息等操作
+
+train.h, train.cpp实现了火车类和余票信息类，order.h, order.cpp实现了订单类与候补订单类，ticket类实现了直通票类和转乘票类
+
+trainDatabase实现了一个火车票管理类，支持添加火车、发布火车、查询车票、买票退票等功能
+
+tools.h中有一些小工具，如字符串转整数、字符串分割等
+
+tokenscanner.h和tokenscanner.cpp实现了一个可以将命令划分并存储各参数的类，便于指令与accountDatabase和trainDatabase的交流
+
+## 数据库设计
+
+##### 核心理念：
+
+用MemoryRiver储存信息，将信息在文件中的索引与某个key绑定存入B+树。查询时通过B+树先查到索引，再从文件索引位置读出信息。
+
+##### accountDatabase:
+
+`//key为username，value为索引的B+树`
+`BPT account_bpt_{"account_bpt"}; `
+
+`//存放用户信息，每个Account在文件中的位置与其username作为键值对插入到BPT中`
+`MemoryRiver<Account, 0> account_file_; `
+
+##### trainDatabase:
+
+`//key为trainID，value为用户索引的B+树`
+`BPT train_bpt_{"train_bpt_"}; `
+
+`//存放火车信息，每个Train在文件中的位置与其trainID作为键值对插入到BPT中`
+`MemoryRiver<Train, 0> train_file_; `
+
+`//key为station，value为列车索引的B+树`
+`BPT station_bpt_{"station_bpt_"}; //记录经过station的车的索引`
+
+`//Train类里面有一个ticket_idx是其余票在文件中的位置 `
+`MemoryRiver<Ticket, 0> ticket_file_; //存放余票信息`
+
+`//key为username，value为订单索引的B+树`
+`BPT order_bpt_{"order_bpt_"};`
+
+`//存放订单信息，每个Order在文件中的位置与其username作为键值对插入到BPT中`
+`MemoryRiver<Order, 0> order_file_; `
+
+`//key为trainID+发售天数，value为候补订单索引的B+树`
+`BPT pending_bpt_{"pending_bpt_"};`
+
+`//存放候补订单信息，每个PendingOrder在文件中的位置与其购买的车次+天数作为键值对插入到BPT中`
+`MemoryRiver<PendingOrder, 0> pending_file_; `
 
 
-本作业分为两个部分。
-
-在第一部分中，需要实现一个基于文件的 B+ 树。
-
-在第二部分中，需要实现一个火车票管理系统。此部分要求使用 Git 开发，维持良好的项目管理习惯。此部分的中期检查等检查方式均会通过查看登记的 Git 仓库链接，因此如果想更换仓库的链接请及时联系助教。
-
-### 作业周期
-
-**注意：管理系统的截止日期 (2024-06-02 第 15 周周日) 为作业的硬性截止日期，除非有极其特殊的原因，否则不接受任何在截止后的提交，所有代码均以截止前的提交为准！**
-
-- B+ 树: 2024-04-14（第 8 周周日）~ 2024-05-12（第 12 周周日）
-- 管理系统: 2024-05-12（第 12 周周日）~ 2024-06-02（第 15 周周日）
-
-## 评分标准
-
-本作业占本课程总成绩 15%，其中 B+ 树占 7%，管理系统占 8%。
-
-- B+ 树: 7%
-  - OJ 测试: 80%
-  - Code Review: 20%
-- 管理系统: 8%
-  - 正确性测试: 50%
-    - 在正确性测试中，每一个测试点都有一个相对宽松的时间和磁盘使用限制，以仅检验程序的正确性和鲁棒性，只要通过测试即可得到满分。因此请不要尝试针对特定情况进行有损正确性和鲁棒性的优化。
-  - 压力测试 - 30%
-    - 在压力测试中，每一个测试点会有两档时间和磁盘限制，通过所有 Easy 的测试可以得到 (60% * 30% =) 18% 的分数，通过所有 Hard 测试可以得到另外 (40% * 30% =)  12% 的分数。
-  - Code Review: 20%
-
-bonus 另外计算，计入平时分总分，且不超过总分的 1%。
-
-## B+ 树 - 7%
-
-### 作业要求
-
-作业要求实现基于 BPT 的外存管理系统。在本作业中，只允许调用以下头文件中的函数和类：
-
-iostream, string, cstdio, cmath, string, fstream, filesystem
-
-不允许使用这些头文件包含的 STL 容器 (如 `std::vector`) 或算法 (如 `std::sort`)。唯一的例外是，你可以使用 `std::string`。如果需要用到其他与算法、数据结构无关的标准库，请向助教提出请求。
-
-你需要在最后通过 [OJ 测试](https://acm.sjtu.edu.cn/OnlineJudge/problem/2186)。
-
-注意：建议使用类模板以方便后续完成管理系统。
-
-## 管理系统 - 8%
-
-见 [管理系统文档](management_system.md)。
-
-数据压缩包下发在群里。
-
-### 负责助教
-李心瑶 金嘉禾 王鲲鹏
-
-
-## Bonus
-
-见 [Bonus 文档](bonus.md)。
-
-准备自行设计并实现其他 bonus 的同学可以联系助教协商。
-
-## 扣分
-
-请保证自己项目结构的可读性，可以包括优化项目结构、完善 README 的内容、适当的文件树指南等，晦涩难懂的项目可能会加大助教的工作量，也可能会影响你的成绩（B+ 树阶段此条可忽略）。
-
-**如有出现任何抄袭现象按 0 分计，并按照违反学术诚信的操作办法处理。**
-请保证自己项目结构的可读性，可以包括优化项目结构、完善 README 的内容、适当的文件树指南等，晦涩难懂的项目可能会加大助教的工作量，也可能会影响你的成绩（B+ 树阶段此条可忽略）。
-
-**如有出现任何抄袭现象按 0 分计，并按照违反学术诚信的操作办法处理。**
-
-### 中期检查
-
-由于火车票后端设计难度较大，请同学们 **务必** 在设计好清晰的文件结构以及代码框架后再动手。
-为了督促同学们的完成进度，我们将在 **5月26日（星期天）** 进行一次中期检查，检查内容包含：
-- 仓库代码，要求建好各模块的文件，设计好基本的类（包含数据成员）以及几个基本的函数接口（要求有函数签名）
-- 口头回答对 `query_transfer` 的设计
-中期检查效果不理想的同学可能会被扣除5%以内的分数。
-  
