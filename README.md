@@ -1,12 +1,11 @@
 # Konpaku_ming's Ticket_System-2025
 
-这里是youming的大作业Ticket_System，作业要求见[管理系统文档](https://github.com/konpaku-ming/Ticket-System-2025/blob/main/management_system.md)
+这里是youming的大作业Ticket_System，作业要求见[管理系统文档](https://github.com/konpaku-ming/Ticket-System-2025/blob/main/management_system.md)<br>
 希望阅读该文档能帮助你理解本仓库代码<br>
 
 ## 仓库结构
 
 #### include/
-
 - BPlusTree.h
 - account.h
 - accountDatabase.h
@@ -25,7 +24,6 @@
 - vector.h
 
 #### src/
-
 - BPlusTree.cpp
 - account.cpp
 - date.cpp
@@ -35,8 +33,8 @@
 - tokenscanner.cpp
 - train.cpp
 
-**CMakeLists.txt**
-**README.md**
+**CMakeLists.txt**<br>
+**README.md**<br>
 **management_system.md**
 
 ## 文件概述
@@ -59,9 +57,9 @@ tokenscanner.h和tokenscanner.cpp实现了一个可以将命令划分并存储�
 
 ## 数据库设计
 
-##### 核心理念：
+##### 核心思想：
 
-用MemoryRiver储存信息，将信息在文件中的索引与某个key绑定存入B+树。查询时通过B+树先查到索引，再从文件索引位置读出信息。
+用MemoryRiver储存信息， 将信息在文件中的索引与某个key绑定存入B+树。查询时通过B+树先查到索引，再从文件索引位置读出信息。
 
 ##### accountDatabase:
 
