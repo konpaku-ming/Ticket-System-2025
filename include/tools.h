@@ -2,7 +2,7 @@
 #define TOOLS_H
 
 #include "vector.h"
-#include "utility.h"
+#include "../include/utility.h"
 #include "priority_queue.h"
 #include <string>
 #include "../include/time.h"

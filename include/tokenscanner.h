@@ -2,7 +2,6 @@
 #define TOKENSCANNER_H
 
 #include "tools.h"
-#include "vector.h"
 
 class TokenScanner {
 public:
